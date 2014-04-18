@@ -21,7 +21,7 @@ if(!(Test-Path -Path ($mount_dir)))
 
 if ($drivers_dir -eq $null)
 {
-	$drivers_dir = $script_path+"\os"
+	$drivers_dir = $script_path+"\drivers"
 }
 
 if ($dism -eq $null)
