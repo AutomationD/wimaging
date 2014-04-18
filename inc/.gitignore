@@ -1,0 +1,4 @@
+# Ignore everything in this directory
+Config.ps1
+# Except this file
+!.gitignore

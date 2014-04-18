@@ -1,0 +1,3 @@
+mount/*
+# Except this file
+!.gitignore

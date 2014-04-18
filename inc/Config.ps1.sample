@@ -1,0 +1,57 @@
+# Operation system
+# Available options:
+#############################
+# server-2008r2
+# TDB: server-2012
+# TDB: server-2012r2
+#############################
+$os = "server-2008r2"
+
+# Edition
+# Available options:
+#############################
+# standard
+# enterprise
+# datacenter
+#############################
+$edition = "enterprise"
+
+# If managing a boot image
+$boot = $true
+
+# Directory that will be used to mount wim files for processing. Default is $mount_dir = $script_path +"\" + $os + "\mount"
+#$mount_dir = ""
+
+# Directory that will be used to output captured wims (and further processing). Uses images\$os\captured by default
+#$captured_wims_dir = ""
+ 
+# Directory where windows distributions reside. Must be a directory that is served from a network share. 
+#$windows_install_root = ""
+
+# Path to drivers directory, default .\drivers
+#$drivers_dir = ""
+
+# DISM Location, default 'dism.exe'
+#$dism = ""
+
+# Imagex Location
+#$imagex = ""
+
+# Path to drivers directory
+#$drivers_dir = ""
+
+
+# WSUS Offline location. Must point to root that contains subfolders for distributions
+$wsus_offline_dir = ""
+
+# Sytem Reserved Partition Mount Letter. Used when mounting VHD
+$system_reserved_mount="R"
+
+# Sytem Reserved Partition Mount Letter. Used when mounting VHD
+$c_drive_mount="M"
+
+# Hyper-V root location. Directory where your VM subdirectories are located
+$hyperv_root="e:\vm"
+
+# Suffix for the name for hyper-v machine that you keep for imaging
+$hyperv_img_suffix="-img"
