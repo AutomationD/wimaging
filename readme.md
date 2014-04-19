@@ -39,10 +39,10 @@ Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cm
 - Copy c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim to .\images\wimdows-pe-x64\sources\boot.wim
 
 Run
-	.\Add-Tools.ps1
-	.\Add-Drivers.ps1
-	.\Add-Updates.ps1
-	.\Push-Wim.ps1
+    .\Add-Tools.ps1
+    .\Add-Drivers.ps1
+    .\Add-Updates.ps1
+    .\Push-Wim.ps1
 
 
 # Install Windows on the Hyper-V vm and sysprep it
