@@ -37,6 +37,7 @@ Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cm
 
 # Create boot.wim with injected storage / network drivers and toolset
 - Copy c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim to .\images\wimdows-pe-x64\sources\boot.wim
+
 Run
 	.\Add-Tools.ps1
 	.\Add-Drivers.ps1
