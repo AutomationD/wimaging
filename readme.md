@@ -4,6 +4,7 @@ The Idea creation of the image from scratch is that you can adapt your process t
 
 # Prerequisites:
 - Windows Server with Hyper-V
+- [Windows Assessment and Deployment Kit (ADK) for Windows® 8](http://www.microsoft.com/en-us/download/details.aspx?id=30652)
 
 # Flow
 - Clone the wimaging repo
@@ -35,7 +36,13 @@ Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cm
 - dotnetsetupexe: DotNet4.0 installer path 
 
 # Create boot.wim with injected storage / network drivers and toolset
-- Run .\Add-Drivers.ps1
+- Copy c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim to .\images\wimdows-pe-x64\sources\boot.wim
+Run
+	.\Add-Tools.ps1
+	.\Add-Drivers.ps1
+	.\Add-Updates.ps1
+	.\Push-Wim.ps1
+
 
 # Install Windows on the Hyper-V vm and sysprep it
 - Download Windows VLK iso for Windows Server Enterprise 2008 R2 with SP1 (Make sure you download MAK, if you don't have a KMS server)

@@ -8,6 +8,11 @@ if ($imagex -eq $null)
     $imagex = $script_path+"\tools\boot.root\utils\imagex\imagex.exe"
 }
 
+if ($windows_adk_path -eq $null)
+{
+	$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit"
+}
+
 # Mount Directory
 if ($mount_dir -eq $null)
 {
@@ -62,7 +67,8 @@ if ($boot -ne $true)
             $wim_index = 3
             
             # Image name in the original install.wim
-			$wim_image_name = "Windows Server 2008 R2 SERVERENTERPRISE"
+			$wim_image_name = "Windows Server 2008 R2 SERVERENTERPRISE"			
+	
             
             # Filename for captured (from vhd) wim file
             if ($captured_wims_dir -ne $null)
@@ -99,8 +105,47 @@ else
 		$wim_file = $script_path + "\images\" + $os + "\work\boot.wim"        
         
 		$wim_image_name_pe = "Microsoft Windows PE (x64)"
+		#$wim_image_name_pe = "Microsoft Windows Longhorn WinPE (x64)"
+		
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
+		#$wim_image_name_setup = "Microsoft Windows Longhorn Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
 				
-	}	
+	}
+	elseif ($os -eq "windows-pe-x86")
+	{		
+		# Location of install.wim within windows installation "dvd" root. That's the file that the installer takes. Supposed to be exposed via a network share
+        if ($wim_file_install_root -ne $nul)
+		{
+			$wim_file_install = $windows_install_root+"\windows-pe-x86\sources\boot.wim"
+		}
+		else
+		{	
+			$wim_file_install = $script_path+"\install\"+$os+"\sources\boot.wim"
+		}		
+
+        # Wim file that scripts process (AddTools, AddFeature, etc)
+		$wim_file = $script_path + "\images\" + $os + "\work\boot.wim"
+		$wim_image_name = "Microsoft Windows PE (x86)"
+				
+	}
+	elseif ($os -eq "windows-pe-x64")
+	{		
+		# Location of install.wim within windows installation "dvd" root. That's the file that the installer takes. Supposed to be exposed via a network share
+        if ($wim_file_install_root -ne $nul)
+		{
+			$wim_file_install = $windows_install_root+"\windows-pe-x64\sources\boot.wim"
+		}
+		else
+		{	
+			$wim_file_install = $script_path+"\install\"+$os+"\sources\boot.wim"
+		}		
+
+        # Wim file that scripts process (AddTools, AddFeature, etc)
+		$wim_file = $script_path + "\images\" + $os + "\work\boot.wim"
+		$wim_image_name = "Microsoft Windows PE (x64)"
+				
+	}
+	
+	
 }

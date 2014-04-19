@@ -84,40 +84,72 @@ Function AddFeatures([string]$wim_file, [string]$mount_dir, [string]$wim_image_n
 
 Function AddUpdates([string]$wim_file, [string]$update_dir, [string]$mount_dir, [string]$wim_image_name)
 {
-	#Array to hold package locations
-	$package_path = @()
-
-	#Command to mount the WIM
 	
-	MountWim $wim_file $mount_dir $wim_image_name
-	
-	
-
-	#Add every update package to the $packagepagh array
-	$updatepackages = Get-ChildItem $update_dir | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
-	For($i=0; $i -le $updatepackages.Count -1; $i++)
+	if ($boot -eq $false)
 	{
-		$package = $updatepackages[$i].name
+		#Array to hold package locations
+		$package_path = @()
+
+		#Command to mount the WIM
 		
-		if (($package -notmatch "KB2506143") -and ($package -notmatch "KB2819745") -and ($package -notmatch "KB2496898") -and ($package -notmatch "KB2533552") -and ($package -notmatch "KB2604521") -and ($package -notmatch "KB2726535"))		
+		
+		
+		
+
+		#Add every update package to the $packagepagh array
+		$updatepackages = Get-ChildItem $update_dir | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
+		For($i=0; $i -le $updatepackages.Count -1; $i++)
 		{
-			$package_path += "/PackagePath:$update_dir\$package"			
+			$package = $updatepackages[$i].name
+			
+			if (($package -notmatch "KB2506143") -and ($package -notmatch "KB2819745") -and ($package -notmatch "KB2496898") -and ($package -notmatch "KB2533552") -and ($package -notmatch "KB2604521") -and ($package -notmatch "KB2726535"))		
+			{
+				$package_path += "/PackagePath:$update_dir\$package"			
+			}
+			else
+			{
+				Write-Host "Skipping .net 4.0 dependant packages"
+			}
+			
 		}
-		else
-		{
-			Write-Host "Skipping .net 4.0 dependant packages"
-		}
+
+		#Add packages to the WIM	
+		Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package $package_path"
+		
+		Write-Host "Installing .net 3.5"
+		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3"
+		
+
 		
 	}
-
-	#Add packages to the WIM	
-	Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package $package_path"
-	
-	Write-Host "Installing .net 3.5"
-	Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3"
-	
-
-	UnmountWim $mount_dir
+	else
+	{
+		$package_path = @()
+		
+		# Base Packages
+		$updatepackages = Get-ChildItem "$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\" | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
+		For($i=0; $i -le $updatepackages.Count -1; $i++)
+		{
+			$package = $updatepackages[$i].name
+			if (($package -match "WinPE-Scripting"))		
+			{
+				$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\$package'"			
+			}
+		}
+		
+		# Language-Specific Packages
+		#$updatepackages = Get-ChildItem "$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\en-us" | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
+		#For($i=0; $i -le $updatepackages.Count -1; $i++)
+		#{
+		#	$package = $updatepackages[$i].name
+		#	$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\en-us\$package'"			
+		#}
+		
+		Write-Host "Adding PE Packages"
+		Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package $package_path"
+		
+		
+	}
 }
 
 Function AddTools([string]$tools_dir, [string]$mount_dir)
@@ -152,13 +184,15 @@ Function AddTools([string]$tools_dir, [string]$mount_dir)
 			Write-Error "Error ${lastexitcode}"
 			exit $lastexitcode
 		}
+		
+		
 	}
 }
 
 Function PushWim([string]$wim_file)
 {		
 	Write-Host "Copying $wim_file to $wim_file_install"
-	Copy-Item $wim_file $wim_file_install -force
+	Copy-Item $wim_file $wim_file_install -force -recurse
 }
 
 Function GetCapturedWim([string]$captured_wim,[string]$wim_file)
@@ -227,6 +261,8 @@ Function InitWorkWim([string]$wim_file, [string]$init_yn = 'y')
 				
 			}
 	}
+	
+	## TODO: copy winpe.wim to boot.wim
 }
 
 
