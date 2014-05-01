@@ -1,0 +1,89 @@
+@echo off
+set deploymentShare=deployment.domain.com
+set netUser=NetworkUserName
+set foremanUrl=http://foreman.domain.com
+set netDriveLetter=Z
+
+
+ping -n 5 127.0.0.1 >nul
+echo Loading WinPE...
+wpeinit
+
+echo Starting networking...
+:testagain
+ipconfig /renew
+ping -n 1 %deploymentShare% > NUL
+if %errorlevel% == 0 goto pingok
+REM wait 3 sec. and try it again
+ping -n 3 127.0.0.1 >nul
+goto testagain
+:pingok
+for /f "delims=[] tokens=2" %%a in ('ping -4 %computername% -n 1 ^| findstr "["') do (set thisip=%%a)
+echo Ping to %deploymentShare% OK! Your IP address: %thisip%
+
+
+
+
+echo Mounting network share
+net use %netDriveLetter%: \\%deploymentShare%\win_install %netPass% /USER:%netUser%
+
+set DRIVERS=%netDriveLetter%:\drivers
+ 
+::Disk Partitioning Layout
+REM Create Diskpart File
+set DPFILE=%SYSTEMDRIVE%\dp.txt
+
+
+REM Append commands to Diskpart file
+echo select disk 0 > %DPFILE%
+echo clean >> %DPFILE%
+echo create partition primary size=100 >> %DPFILE%
+echo select partition 1 >> %DPFILE%
+echo active >> %DPFILE%
+echo format quick fs=ntfs >> %DPFILE%
+echo create partition primary >> %DPFILE%
+echo select partition 2 >> %DPFILE%
+echo format quick fs=ntfs label="OS" >> %DPFILE%
+echo assign letter="C" >> %DPFILE%
+echo exit >> %DPFILE%
+
+REM Execute Diskpart with file as script argument
+diskpart /s %DPFILE%
+
+REM Remove Diskpart script file
+del %DPFILE%
+
+
+
+::Write the install image to the partition
+dism.exe /apply-image /imagefile:%netDriveLetter%:\server-2008r2\sources\install.wim /name:"Windows Server 2008 R2 SERVERENTERPRISE" /ApplyDir:C:\
+ 
+::Set the proper boot sector
+bootsect.exe /nt60 C:
+C:\Windows\System32\bcdboot C:\Windows /l en-US
+ 
+::Stage the drivers locally to the system
+::xcopy /e /s %DRIVERS% c:\drivers\
+ 
+::Stage the Unattend.xml file for dism to apply
+::mkdir c:\Windows\Panther\
+echo Downloading unattend.xml
+x:\wget.vbs %foremanUrl% c:\Windows\Panther\
+
+
+::Create a temp staging folder for DISM
+mkdir c:\MININT\Scratch
+ 
+::Apply the Unattend.xml
+dism.exe /Image:C:\ /Apply-Unattend:c:\Windows\Panther\unattend.xml /ScratchDir:C:\MININT\Scratch/
+
+:: Apply Drivers
+dism.exe /Image:C:\ /Add-Driver /Driver:%DRIVERS% /Recurse /ForceUnsigned
+ 
+::Remove the network share
+net use /delete %netDriveLetter%:
+
+ 
+exit
+
+

@@ -1,5 +1,5 @@
 # Ignore everything in this directory and recursively
-Utils
+startnet.cmd
 
 # Except this file
 !.gitignore
