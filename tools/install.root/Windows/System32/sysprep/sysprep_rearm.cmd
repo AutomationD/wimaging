@@ -1,1 +1,0 @@
-sysprep.exe /oobe /generalize /shutdown /unattend:rearm_unattend.xml
