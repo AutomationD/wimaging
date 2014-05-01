@@ -1,0 +1,6 @@
+tools/boot.root.old
+*.wim*
+Tests/*
+Old/*
+# Except this file
+!.gitignore

@@ -1,0 +1,4 @@
+server-2008x64.standard
+windows-pe-x64
+drivers
+!.gitignore
