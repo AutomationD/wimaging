@@ -1,3 +1,4 @@
+tools/boot.root.old/*
 *.wim*
 Tests/*
 Old/*
