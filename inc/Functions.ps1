@@ -63,7 +63,7 @@ Function AddDrivers([string]$wim_file, [string]$drivers_dir, [string]$mount_dir,
 {
 	
 	#Command to mount the WIM
-	Write-Host "Adding Drivers"	
+	Write-Host "Adding Drivers" -foregroundcolor "yellow"
 	Invoke-Expression "& '$dism' /Image:$mount_dir /Add-Driver /Driver:$drivers_dir /Recurse"
 	
 }
@@ -85,16 +85,11 @@ Function AddFeatures([string]$wim_file, [string]$mount_dir, [string]$wim_image_n
 Function AddUpdates([string]$wim_file, [string]$update_dir, [string]$mount_dir, [string]$wim_image_name)
 {
 	
+	Write-Host "Adding Updates" -foregroundcolor "yellow"
 	if ($boot -eq $false)
 	{
 		#Array to hold package locations
-		$package_path = @()
-
-		#Command to mount the WIM
-		
-		
-		
-		
+		$package_path = @()		
 
 		#Add every update package to the $packagepagh array
 		$updatepackages = Get-ChildItem $update_dir | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
@@ -128,14 +123,20 @@ Function AddUpdates([string]$wim_file, [string]$update_dir, [string]$mount_dir, 
 		
 		# Base Packages
 		$updatepackages = Get-ChildItem "$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\" | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
-		For($i=0; $i -le $updatepackages.Count -1; $i++)
-		{
-			$package = $updatepackages[$i].name
-			if (($package -match "WinPE-Scripting"))		
-			{
-				$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\$package'"			
-			}
-		}
+			
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-Scripting.cab'"
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-Setup.cab'"
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-Setup-Client.cab'"
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-WMI.cab'"
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-NetFX4.cab'"		
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-PowerShell3.cab'"		 
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-DismCmdlets.cab'"
+		$package_path += "/PackagePath:'$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\WinPE-StorageWMI.cab'"		
+		
+		
+		
+			
+		
 		
 		# Language-Specific Packages
 		#$updatepackages = Get-ChildItem "$windows_adk_path\Windows Preinstallation Environment\amd64\WinPE_OCs\en-us" | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
@@ -154,7 +155,7 @@ Function AddUpdates([string]$wim_file, [string]$update_dir, [string]$mount_dir, 
 
 Function AddTools([string]$tools_dir, [string]$mount_dir)
 {
-	
+	Write-Host "Adding Tools" -foregroundcolor "yellow"	
 	if ( $(Get-ChildItem $mount_dir | Measure-Object).count -ne 0)
 	{
 		Write-Host "Copying Tools"
@@ -170,6 +171,17 @@ Function AddTools([string]$tools_dir, [string]$mount_dir)
 		exit $lastexitcode
 	}
 	
+	if (Get-Item  "${mount_dir}\Windows\Panther\Unattend.xml" -ea SilentlyContinue)
+		{
+			Write-Host "Removing unattend.xml from C:\Windows\Panther"
+			Remove-Item "${mount_dir}\Windows\panther\unaddend.xml"
+		}
+		
+		if ($lastexitcode -ne 0)
+		{
+			Write-Error "Error ${lastexitcode}"
+			exit $lastexitcode
+		}
 	
 	if ($boot -eq $true)
 	{
@@ -191,7 +203,7 @@ Function AddTools([string]$tools_dir, [string]$mount_dir)
 
 Function PushWim([string]$wim_file)
 {		
-	Write-Host "Copying $wim_file to $wim_file_install"
+	Write-Host "Pushing $wim_file to $wim_file_install" -foregroundcolor "green"
 	Copy-Item $wim_file $wim_file_install -force -recurse
 }
 

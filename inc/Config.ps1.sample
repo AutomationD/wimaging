@@ -2,8 +2,9 @@
 # Available options:
 #############################
 # server-2008r2
-# TDB: server-2012
-# TDB: server-2012r2
+# windows-pe-x64
+# TODO: server-2012
+# TODO: server-2012r2
 #############################
 $os = "server-2008r2"
 
@@ -16,8 +17,8 @@ $os = "server-2008r2"
 #############################
 $edition = "enterprise"
 
-# If managing a boot image
-$boot = $true
+# If managing a boot image ($true or $false)
+$boot = $false
 
 # Directory that will be used to mount wim files for processing. Default is $mount_dir = $script_path +"\" + $os + "\mount"
 #$mount_dir = ""
@@ -28,7 +29,7 @@ $boot = $true
 # Directory where windows distributions reside. Must be a directory that is served from a network share. 
 #$windows_install_root = ""
 
-# Path to drivers directory, default .\drivers
+# Path to drivers directory, default .\install\drivers
 #$drivers_dir = ""
 
 # DISM Location, default 'dism.exe'
@@ -37,12 +38,11 @@ $boot = $true
 # Imagex Location
 #$imagex = ""
 
-# Path to drivers directory
-#$drivers_dir = ""
-
+# Windows ADK (default:c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit)
+#$windows_adk_path=""
 
 # WSUS Offline location. Must point to root that contains subfolders for distributions
-$wsus_offline_dir = ""
+$wsus_offline_dir = "e:\wsus_offline"
 
 # Sytem Reserved Partition Mount Letter. Used when mounting VHD
 $system_reserved_mount="R"

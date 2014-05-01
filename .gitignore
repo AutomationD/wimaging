@@ -1,4 +1,5 @@
-*.wim
+*.wim*
 Tests/*
+Old/*
 # Except this file
 !.gitignore

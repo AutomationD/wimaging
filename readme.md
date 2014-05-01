@@ -6,8 +6,10 @@ The Idea creation of the image from scratch is that you can adapt your process t
 - Windows Server with Hyper-V
 - [Windows Assessment and Deployment Kit (ADK) for Windows® 8](http://www.microsoft.com/en-us/download/details.aspx?id=30652)
 
+
 # Flow
 - Clone the wimaging repo
+- Share "install" directory via Windows Network Share / CIFS
 - Configure wimaging
 - Create boot.wim with injected storage / network drivers and foreman toolset
 - Install Windows on the Hyper-V vm and sysprep it
@@ -16,9 +18,9 @@ The Idea creation of the image from scratch is that you can adapt your process t
 # Configure wimaging
 ## Config.ps1
 Rename .\inc\Config.ps1.sample .\inc\Config.ps1 and set some parameters before doing maintenance of your image
-- $os: server-2008r2 for now. Very important to use provided options, as the directory structure uses that pattern 
+- $os: server-2008r2 or windows-pe-x64. Very important to use provided options, as the directory structure uses that pattern.
 - $edition: standard / enterprise / datacenter
-- $boot: use if servicing boot.wim
+- $boot=$false. Use $true if servicing boot.wim
 - $wsus_offline_dir: directory where locally downloaded windows updates reside.
 - $system_reserved_mount: Letter for mounting a "System reserved" partition of your vhd (pick any drive letter that is not used)
 - $c_drive_mount: Letter for mounting "C: Drive" partition of your vhd (pick any drive letter that is not used)
@@ -36,16 +38,12 @@ Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cm
 - dotnetsetupexe: DotNet4.0 installer path 
 
 # Create boot.wim with injected storage / network drivers and toolset
+- Copy your drivers to .\install\drivers\
 - Copy c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim to .\images\wimdows-pe-x64\sources\boot.wim
-
-Run
-```PowerShell
-.\Add-Tools.ps1
-.\Add-Drivers.ps1
-.\Add-Updates.ps1
-.\Push-Wim.ps1
-```
-
+- Edit .\inc\Config.ps1: $os = "windows-pe-x64" and $boot = $true
+- Edit .\tools\boot.root\Windows\System32\startnet.cmd.sample with your data and rename it to startnet.cmd
+- Run .\Update-All.ps1 that will inject drivers, tools and additional Windows PE Features and push it to install directory.
+Your boot.wim will be available via the nework share \\deployment.domain.com\win_install\windows-pe-x64\sources\boot.wim
 
 # Install Windows on the Hyper-V vm and sysprep it
 - Download Windows VLK iso for Windows Server Enterprise 2008 R2 with SP1 (Make sure you download MAK, if you don't have a KMS server)
@@ -67,4 +65,4 @@ It is very easy to image windows when it's on Hyper-V. Just because of native su
 - Run .\CaptureWim.ps1. By default it will initialize (create) original install.wim in a .\images\<os>\work directory and merge the captured image into it.
 - Run .\Update-WimTools.ps1 to add the contents of .\tools\install.root. Feel free to add your tools that you would like to be in your image.
 - Run .\Push-WimInstall.ps1. It will push your working copy of install.wim to your install location (by default - .\install\<os>\sources\install.wim
-- Share .\install folder via CIFS / SMB
+Your install.wim will be available via the nework share \\deployment.domain.com\win_install\<os>\sources\install.wim
