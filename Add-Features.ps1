@@ -4,4 +4,18 @@
  
  
 # Main Program
-AddFeatures $wim_file $mount_dir $wim_image_name
+MountWim $wim_file $mount_dir $wim_image_name
+AddFeatures $wim_file $mount_dir
+
+# Commit only on successful update
+if ($lastexitcode -ne 0)
+{
+	Write-Host "Errors found, NOT committing any changes"
+	UnmountWim $mount_dir "n"
+}
+else
+{
+	Write-Host "No errors found, committing changes"
+	UnmountWim $mount_dir
+	
+}

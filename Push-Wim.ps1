@@ -3,4 +3,5 @@
 . '.\inc\Functions.ps1' 
 
 # Main Program
-InitWorkWim
+
+PushWim $wim_file

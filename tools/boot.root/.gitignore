@@ -1,5 +1,0 @@
-# Ignore everything in this directory and recursively
-Utils
-
-# Except this file
-!.gitignore

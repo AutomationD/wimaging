@@ -3,22 +3,27 @@
 . '.\inc\Functions.ps1' 
  
 # Main Program
-
-if ($os -eq "windows-pe-x64")
+if ($os -like "windows-pe-*")
 {
 	MountWim $wim_file $mount_dir $wim_image_name
-	AddDrivers $wim_file $drivers_dir $mount_dir $wim_image_name
+	AddDrivers $drivers_dir $mount_dir
 	UnmountWim $mount_dir
 }
 else
 {
-	MountWim $wim_file $mount_dir $wim_image_name_pe
-	AddDrivers $wim_file $drivers_dir $mount_dir $wim_image_name_pe
-	UnmountWim $mount_dir
-	
-	MountWim $wim_file $mount_dir $wim_image_name_setup
-	AddDrivers $wim_file $drivers_dir $mount_dir $wim_image_name_setup
-	UnmountWim $mount_dir
+	if ($boot) {
+		MountWim $wim_file $mount_dir $wim_image_name_pe
+		AddDrivers $drivers_dir $mount_dir
+		UnmountWim $mount_dir
+		
+		MountWim $wim_file $mount_dir $wim_image_name_setup
+		AddDrivers $drivers_dir $mount_dir
+		UnmountWim $mount_dir
+	} else {
+		MountWim $wim_file $mount_dir $wim_image_name
+		AddDrivers $drivers_dir $mount_dir
+		UnmountWim $mount_dir
+	}
 }
 
 
