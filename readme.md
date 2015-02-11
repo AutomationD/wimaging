@@ -1,3 +1,7 @@
+## Disclamer: Work in progress
+This tool is a work-in-progress project. I'm using it in production, but it could have some reduntant code or functionality, although everything should work.
+If you experience any issues (or nothing works at all) - feel free to submit a ticket or catch me on #theforeman on freenode.
+
 Create minimal updated install.wim image from scratch:
 --------------------
 The Idea creation of the image from scratch is that you can adapt your process to any new windows iso that you might have, which gives you flexibility with updating your image set.
