@@ -1,4 +1,6 @@
 ## Disclamer: Work in progress
+
+[![Join the chat at https://gitter.im/kireevco/wimaging](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kireevco/wimaging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 This tool is a work-in-progress project. I'm using it in production, but it could have some reduntant code or functionality, although everything should work.
 If you experience any issues (or nothing works at all) - feel free to submit a ticket or catch me on freenode:@kireevco - #theforeman.
 
