@@ -138,7 +138,7 @@ if ($boot -ne $true) {
 		$install = "${install_root}\${os}"
 	} else {	
 		$wim_file_install = "${script_path}\install\${os}\sources\boot.wim"
-		$installer = "${script_path}\install\${os}"
+		$install = "${script_path}\install\${os}"
 	}
 	
 	if ($os -like "*-pe*") {
@@ -159,6 +159,14 @@ if ($boot -ne $true) {
 	}
 	if ($os -eq "server-2008r2") {
 		$wim_image_name_pe = "Microsoft Windows PE (x64)"
+		
+		
+		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
+		#$wim_image_name_setup = "Microsoft Windows Longhorn Setup (x64)"
+		$wim_image_name = $wim_image_name_setup
+
+	} elseif ($os -eq "server-2012r2") {
+		$wim_image_name_pe = "Microsoft Windows Setup (x64)"
 		
 		
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
