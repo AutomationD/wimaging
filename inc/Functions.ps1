@@ -89,16 +89,25 @@ function GetPackageInfo([string]$packageName, [string]$fileName ) {
     return $packageInfo
 }
 
-function InstallPackages([string]$updates_dir) {
-	Write-Host "Installing updates from $updates_dir."
-
+function InstallPackages([string]$updates_dir) {	
 	$updates_dir = $updates_dir.toLower()
-	$packages = @{}
-    
+	
+	$packages = @()
+	Write-Host "Installing updates from $updates_dir."
+	
+	#Write-Host "Using dism Add-Package method on $updates_dir"
+	#Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package /PackagePath:$updates_dir"
+
+	# TODO: Add xml parsing to remove bad kbs
+	# Disabled until xml will be valid. Until then use windows system image manager - add Packages
+	# CreateServicingUnattendXML $packages "${install}\unattend.xml"
+	
+	
 	# $updatepackages = Get-ChildItem $updates_dir | where {$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
-	$updatepackages = Get-ChildItem $updates_dir | where {$_.extension -eq ".cab" }
+	$updatepackages = Get-ChildItem $updates_dir | where {$_.extension -eq ".cab" -or $_.extension -eq ".msu" }
 	for($i=0; $i -le $updatepackages.Count -1; $i++) {
 		$packageFileName = $updatepackages[$i].name
+		
 		
 		if ((				
 			($packageFileName -notlike "*winpe-setup*") -and
@@ -113,35 +122,41 @@ function InstallPackages([string]$updates_dir) {
 			($packageFileName -notlike "*KB3003057*") -and
 			($packageFileName -notlike "*KB2726535*")
 			
-		)) {
+		) -and (
+			($packageFileName -notlike "*KB2726535*")
+		)) 
+
+
+		 {
 
 			$packageName = GetPackageNameFromFileName($packageFileName)
 			$packagePath = "$updates_dir\$packageFileName"
 
-			$packages[$i] =@{'name'=$packageName; 'path' = $packagePath}
+			$packages += $packagePath
 			
 		} else {
 			Write-Host "${packageName}: Skipping (excluded)"
 		}
+	}	
+	
+	$packageFilteredDir = "${updates_dir}\filtered"	
+	if (!(Test-Path "$packageFilteredDir")) {
+		New-Item -Path "$packageFilteredDir" -Type directory -ErrorAction SilentlyContinue | Out-Null	
 	}
 
-	# TODO: Add xml parsing to remove bad kbs
-	# Disabled until xml will be valid. Until then use windows system image manager - add Packages
-	# CreateServicingUnattendXML $packages "${install}\unattend.xml"
+	Write-Host "Copying Filtered Updates"
+	foreach ($package in $packages) {
+		#Copy-File $package "$packageFilteredDir\"
+		Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package /PackagePath:$package"
+	}
 	
+ 	#Write-Host "Installing packages from $packageFilteredDir to $mount_dir"
+	#Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package /PackagePath:$packageFilteredDir"
 
-	# $packages.GetEnumerator() | % { 
- #    Write-Host "Current hashtable is: $($_.key)"
- #    Write-Host "Value of Entry 1 is: $($_.value["name"])" 
- #    Write-Host "Value of Entry 1 is: $($_.value["path"])" 
-	# }
-
-	# foreach ($package in $packages) {
-	# 	Write-Host "Installing $package to $mount_dir"
-	# Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package /PackagePath:$package"
-	Invoke-Expression "& '$dism' /image:$mount_dir /Apply-Unattend:${install}\unattend.xml"
-	 
-	# }
+	####
+	# Write-Host "Using unattend.xml method to provide a list of packages with dependencies (probably doesn't work)"
+	# Invoke-Expression "& '$dism' /image:$mount_dir /Apply-Unattend:${install}\unattend.xml"
+	####
 	#Add packages to the WIM	
 	return $lastexitcode
 }
@@ -221,7 +236,7 @@ function AddFeatures([string]$mount_dir) {
 
 	} else {
 		Write-Host "Installing .net 3.5"
-		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3"
+		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all"
 	}
 }
 
@@ -231,12 +246,12 @@ function AddUpdates([string]$updates_dir, [string]$mount_dir, [string]$wim_image
 	
 	if ($boot -eq $false) {
 		#Array to hold package locations
-		$package_path = @()		
+		$package_path = @()
+		
+		Write-Host "Installing .Net 3.5 from $sources"
+		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all /source:$sources\sources\sxs"
 
 		InstallPackages($updates_dir)
-		
-		Write-Host "Installing .net 3.5"
-		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3"
 	} else {
 		Write-Host "Processing the following packages:"
 		
@@ -452,7 +467,7 @@ function InitPxeBoot() {
 
 }
 
-function InitWorkWim([string]$init_yn) {	
+function InitWorkWim([string]$init_yn) {
 	if ("y","n" -contains $init_yn) {
 		$answer = $init_yn
 	} else {
@@ -468,6 +483,12 @@ function InitWorkWim([string]$init_yn) {
 				exit 1
 			}
 	    "y" {
+				if (!(Test-Path "${script_path}\images\${os}\work")) {
+					New-Item -Path "${script_path}\images\${os}\work" -Type directory -ErrorAction SilentlyContinue | Out-Null	
+				} else {
+					Write-Host "Found ${script_path}\images\${os}\work. Moving on."
+				}
+				
 				Write-Host "Initializing ${wim_file} from ${sources_wim_file}"
 				Copy-File $sources_wim_file $wim_file -Force
 				if ($lastexitcode -ne 0) {

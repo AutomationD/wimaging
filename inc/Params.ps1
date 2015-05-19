@@ -7,6 +7,11 @@ Set-Location $script_path
 $vhd_file = "${script_path}\images\${os}\vm\${os}.${edition}.vhd"
 $vbox_file = "${script_path}\images\${os}\vm\${os}.vbox"
 
+# Architecture
+if ($arch -eq $null) {
+	$arch = "amd64"
+}
+
 $mount_disk = $c_drive_mount	
 
 if ($boot) {
@@ -20,7 +25,11 @@ if ($imagex -eq $null) {
 }
 
 if ($windows_adk_path -eq $null) {
-	$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit"
+	if ($os -eq "server-2012r2") {
+		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
+	} else {
+		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit"
+	}	
 }
 
 # Mount Directory
@@ -37,7 +46,11 @@ if ($drivers_dir -eq $null) {
 }
 
 if ($dism -eq $null) {
-	$dism = 'dism.exe'
+	if ($os -eq "server-2012r2") {
+		$dism = "${windows_adk_path}\Deployment Tools\${arch}\DISM\dism.exe"
+	} else {
+		$dism = 'dism.exe'
+	}	
 }
 
 if ($sources_root -ne $nul) {
@@ -96,10 +109,21 @@ if ($boot -ne $true) {
 			$wim_index = 1
 			$wim_image_name = "Windows Server 2008 R2 SERVERSTANDARD"
 		}		
-	} else {
-		if ($os -like "*-pe-*") {
-			$updates_dir = $pe_features_root			
+	} elseif ($os -eq "server-2012r2") {
+        # Directory where the updates are located
+		$updates_dir = $wsus_offline_dir+"\w63-x64\glb"
+		if ($edition -eq "datacenter") {
+			# Index of the actual image in the original install.wim
+            $wim_index = 4
+            
+            # Image name in the original install.wim
+			$wim_image_name = "Windows Server 2012 R2 SERVERDATACENTER"	
+		} elseif ($edition -eq "standard") {
+			$wim_index = 2
+			$wim_image_name = "Windows Server 2012 R2 SERVERSTANDARD"
 		}
+	} elseif ($os -like "*-pe-*") {
+		$updates_dir = $pe_features_root			
 	}
 
 

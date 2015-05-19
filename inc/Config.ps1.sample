@@ -55,3 +55,6 @@ $hyperv_root="e:\vm"
 
 # Suffix for the name for hyper-v machine that you keep for imaging
 $hyperv_img_suffix="-img"
+
+# Virtual Box Manage Utility
+$vbox_manage="c:\Program Files\Oracle\VirtualBox\VBoxManage.exe"

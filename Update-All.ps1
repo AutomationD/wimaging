@@ -23,7 +23,7 @@ else
 		
 		while("y","n" -notcontains $answer)
 		{
-			$answer = Read-Host "AddDrivers, Add Updates, AddTools. Continue? (y/n)"
+			$answer = Read-Host "AddDrivers, Add Updates, AddTools.`nContinue? (y/n)"
 		}
 		
 		if ($answer -eq "n")
@@ -47,7 +47,7 @@ else
 		AddDrivers $drivers_dir $mount_dir
 		AddTools $tools_dir $mount_dir
 		
-		# This will add PE additional packages
+		# This will add additional PE packages
 		AddUpdates $updates_dir $mount_dir
 		UnmountWim $mount_dir
 		
@@ -68,7 +68,7 @@ else
 		
 		while("y","n" -notcontains $answer)
 		{
-			$answer = Read-Host "AddDrivers, Add Updates, AddTools. Continue? (y/n)"
+			$answer = Read-Host "AddTools, AddUpdates. `nContinue? (y/n)"
 		}
 		
 		if ($answer -eq "n")
@@ -80,7 +80,8 @@ else
 				
 		MountWim $wim_file $mount_dir $wim_image_name
 		AddTools $wim_file $mount_dir $wim_image_name
-		AddDrivers $drivers_dir $mount_dir
+		Write-Host "Not adding any drivers. They should be injected into boot.wim as well as accessible via CIFS at \\wimagingHost\\install\drivers"
+		#AddDrivers $drivers_dir $mount_dir
 		AddUpdates $updates_dir $mount_dir
 	}
 }
