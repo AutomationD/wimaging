@@ -79,6 +79,10 @@ Pusing our image to .\install\ directory, where it will be available to foreman
 ```powershell
 .\Push-Wim.ps1
 ```
+Initialize boot tools (wimboot, etc)
+```powershell
+.\Init-PxeTools.ps1
+```
 
 ## Windows 2008 R2
 In case you are working with 2008 R2 - the process is a little bit different (because we can't inject certain updates to windows server 2008 image.
