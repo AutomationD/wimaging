@@ -126,13 +126,29 @@ This template will allow us to boot into a ```wimboot``` bootloader that will lo
 [http://<formeanHost>/config_templates](http://<formeanHost>/config_templates) -> _New Template_
 
 - __Provisioning Template__
-    - __Name__: _Windows PXE_
+    - __Name__: _Windows PXELinux_
     - __Template Editor__:
     ```
     ```
 - __Type__
     - __Snippet__: no
     -  __Type__: PXELinux
+-  __Association__
+    - __Applicable OS__: Windwows 2012 R2
+
+## Provisioning Template (unattend.xml)
+This template will be used when we start our setup.
+[http://<formeanHost>/config_templates](http://<formeanHost>/config_templates) -> _New Template_
+
+- __Provisioning Template__
+    - __Name__: _Windows unattend.xml_
+    - __Template Editor__:
+    ```
+    <xml>...
+    ```
+- __Type__
+    - __Snippet__: no
+    -  __Type__: provision
 -  __Association__
     - __Applicable OS__: Windwows 2012 R2
 
@@ -183,13 +199,12 @@ This partition table will create Windows Server 2008 R2 and higher compatible pa
 ## Installation Media
 [http://<foremanHost>/media](http://<foremanHost>/media) -> _New Medium_
 - __Medium__
-    - __Name__: _Windows Server 2012 R2 Enterprise_
-    - __Path__: [http://<wimagingHost>/install/server-2012r2/server-2012r2x64.enterpise](http://<wimagingHost>/install/server-2012r2/server-2012r2x64.enterpise)
+    - __Name__: _Windows Server 2012 R2 Standard_
+    - __Path__: [http://<wimagingHost>/install/server-2012r2/server-2012r2x64.standard](http://<wimagingHost>/install/server-2012r2/server-2012r2x64.standard)
     - __OS Family__: _Windows_
 
 - __Locations__
-    -  _<yourLocations>_
-
+    -  _<yourLocations>_ - keep empty if you don't use locations.
 
 ## Operating System
 [http://<formeanHost>/operatingsystems](http://<formeanHost>/operatingsystems) -> _New Operating System_. You have to create OS first, and then reopen it to assign Partition Table, Installation Media, etc.
@@ -208,7 +223,8 @@ This partition table will create Windows Server 2008 R2 and higher compatible pa
 - __Installation Media__
     - Windows Server 2012 R2 Enterprise (defined [here](#partition-table))
 - __Templates__
-    - Windows Server 2012 R2 Enterprise (defined [here](#partition-table))
+    - __PXELinux__: _Windows PXELinux_ (defined [here](#partition-table))
+    - __finish__: _Windows Finish_ (defined [here](#partition-table))
     
 # Commands Information
 - ```Init-InstallSources.ps1```: Copies ISO files to wimaging.
