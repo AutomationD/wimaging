@@ -8,29 +8,29 @@ The Idea creation of the image from scratch is that you can adapt your process t
 
 
 # QuickStart
-- Clone the wimaging repo
-- Copy contents of your windows DVD to ./sources/server-<version>/
-- Configure wimaging (./inc/Config.ps1)
+- Clone the wimaging repo: ```git clone https://github.com/kireevco/wimaging.git```
+- Copy contents of your windows DVD to ```./sources/server-<version>/```
+- Configure wimaging (```./inc/Config.ps1```)
 - Create boot.wim with injected storage / network drivers and foreman toolset
 - Create install.wim with injected storage / network drivers and foreman toolset
-- Share "install" directory via Windows Network Share / CIFS + expose it via http (__http://<wimagingHost>/install/__)
+- Configure http / CIFS share
 - Configure Foreman
 - Provision a Windows host
 
 
-# Configure wimaging
+# Configure Wimaging
 ## Config.ps1
-Rename .\inc\Config.ps1.sample .\inc\Config.ps1 and set some parameters before doing maintenance of your image
-- $os: server-2008r2 or windows-pe-x64 (x86) or server-2012r2. Very important to use provided options, as the directory structure uses that pattern. See examples in Config.ps1
-- $edition: standard / enterprise / datacenter
-- $boot=$false. Use $true if servicing boot.wim
-- $wsus_offline_dir: directory where locally downloaded windows updates reside (for ex.: ```$wsus_offline_dir = "c:\wsusoffline\client"```)
+Rename ```.\inc\Config.ps1.sample``` ```.\inc\Config.ps1``` and set some parameters before doing maintenance of your image
+- __$os__: server-2008r2 or windows-pe-x64 (x86) or server-2012r2. Very important to use provided options, as the directory structure uses that pattern. See examples in Config.ps1
+- __$edition__: _standard_ / _enterprise_ / _datacenter_
+- __$boot__=_$false_. Use _$true_ if servicing boot.wim
+- __$wsus_offline_dir__: directory where locally downloaded windows updates reside (for ex.: ```$wsus_offline_dir = "c:\wsusoffline\client"```)
 - $system_reserved_mount: Letter for mounting a "System reserved" partition of your vhd (pick any drive letter that is not used)
 - $c_drive_mount: Letter for mounting "C: Drive" partition of your vhd (pick any drive letter that is not used)
 
-## config.cmd
+## Config.cmd
 File is used during actual installation and is copied into the image as a part of the minimal toolset
-Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cmd and set parameters:
+Rename ```.\tools\install.root\Windows\Setup\Scripts\config.cmd.sample``` to ```config.cmd``` and set parameters:
 - logfile
 - deployment
 - username
@@ -38,11 +38,19 @@ Rename .\tools\install.root\Windows\Setup\Scripts\config.cmd.sample to config.cm
 - foremanserver
 - dotnetsetupexe: DotNet4.0 installer path
 
+## Configure http / CIFS share
+We will need to share "install" directory via Windows Network Share / CIFS and (```\\wimagingHost\\install```) and expose it via http. Let's create some aliases on a webserver for our http endpoints (required for __media__ concept in Foreman):
+- Point [http://wimagingHost/install/server-2012r2x64.standard](http://wimagingHost/install/server-2012r2x64.standard) to ```.\install\server-2012r2```
+- Point [http://wimagingHost/install/server-2012r2x64.enterprise](http://wimagingHost/install/server-2012r2x64.enterprise) to ```.\install\server-2012r2```
+- Point [http://wimagingHost/install/server-2008r2x64.standard](http://wimagingHost/install/server-2008r2x64.standard) to ```.\install\server-2008r2```
+- Point [http://wimagingHost/install/server-2008r2x64.enterprise](http://wimagingHost/install/server-2008r2x64.enterprise) to ```.\install\server-2008r2```
+
+
 # Create boot.wim with injected storage / network drivers and toolset
-- Copy your drivers to .\install\drivers\
-- Copy c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim to .\images\wimdows-pe-x64\sources\boot.wim
-- Edit .\inc\Config.ps1: ```$os = "windows-pe-x64"``` and ```$boot = $true```
-- Edit .\tools\boot.root\Windows\System32\startnet.cmd.sample with your data and rename it to startnet.cmd
+- Copy your drivers to ```.\install\drivers\```
+- Copy ```c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim``` to ```.\images\wimdows-pe-x64\sources\boot.wim```
+- Edit ```.\inc\Config.ps1```: ```$os = "windows-pe-x64"``` and ```$boot = $true```
+- Edit ```.\tools\boot.root\Windows\System32\startnet.cmd.sample``` with your data and rename it to ```startnet.cmd```
 - Run ```.\Update-All.ps1``` that will inject drivers, tools and additional Windows PE Features and push it to install directory.
 Your boot.wim will be available via the nework share \\deployment.domain.com\win_install\windows-pe-x64\sources\boot.wim
 
@@ -94,14 +102,14 @@ Your install.wim will be available via the nework share ```\\deployment.domain.c
 # Configure Foreman
 - Add [wimboot](http://git.ipxe.org/releases/wimboot/wimboot-latest.zip) bootloader to your ```/tftpd/boot/``` on your PXE server.
 - Add installation media ([Example](#add-installation-media)) 
-- Add OS (http://<foremanHost>/operatingsystems) ([Example](#windows-server-2012-r2-os-config))
+- Add OS (http://foremanHost/operatingsystems) ([Example](#windows-server-2012-r2-os-config))
 
 # Adding a new OS to wimaging:
 - Create ```./sources/server-<version>/```
 - Change ```.\inc\Params.ps1: Add new os handler``` to ```# Directory where the updates are located``` section. Make sure to verify WIM image names / indexes (```Windows Server 2012 R2 SERVERENTERPRISE```. Run ```.\Get-WimInfo.ps1```)
 - Follow the Flow
 
-# Config Examples
+# Examples
 _Here is an example configuration for __Windows Server 2012 R2 Standard___:
 
 
@@ -197,10 +205,10 @@ This partition table will create Windows Server 2008 R2 and higher compatible pa
 - __Os family__: _Windows_
 
 ## Installation Media
-[http://<foremanHost>/media](http://<foremanHost>/media) -> _New Medium_
+[http://foremanHost/media](http://foremanHost/media) -> _New Medium_
 - __Medium__
     - __Name__: _Windows Server 2012 R2 Standard_
-    - __Path__: [http://<wimagingHost>/install/server-2012r2/server-2012r2x64.standard](http://<wimagingHost>/install/server-2012r2/server-2012r2x64.standard)
+    - __Path__: [http://wimagingHost/install/server-2012r2/server-2012r2x64.standard](http://wimagingHost/install/server-2012r2/server-2012r2x64.standard)
     - __OS Family__: _Windows_
 
 - __Locations__
