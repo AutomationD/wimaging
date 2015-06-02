@@ -162,6 +162,23 @@ function InstallPackages([string]$updates_dir) {
 }
 
 
+function SafeUnmountWim ([string]$mount_dir) {
+	# Commit only on successful update
+	if ($lastexitcode -ne 0)
+	{
+		Write-Host "Errors found, NOT committing any changes"
+		UnmountWim $mount_dir "n"
+		Write-Error "Wim was as not pushed"
+	}
+	else
+	{
+		Write-Host "No errors found, committing changes"
+		UnmountWim $mount_dir
+		#PushWim $wim_file
+		
+	}
+}
+
 function Copy-File([string]$src, [string]$dst) {
 	Start-BitsTransfer -Source $src -Destination $dst -Description "Copying ${src} to ${dst}" -DisplayName "File Copy"
 }
@@ -420,7 +437,7 @@ function RevertWorkWim([string]$wim_file, [string]$init_yn)
 		$answer = $init_yn
 	} else {
 		while("y","n" -notcontains $answer) {
-			$answer = Read-Host "This is useful when you want to reset your working wim file to your latest release version. Revert ${wim_file} to ${wim_file_install}? (y/n)"
+			$answer = Read-Host "This is useful when you want to reset your working wim file to your latest release version.`nRevert ${wim_file} to ${wim_file_install}? (y/n)"
 		}
 	}
 	
@@ -444,7 +461,7 @@ function InitInstallSources([string]$init_yn) {
 	} else {
 		while("y","n" -notcontains $answer)
 		{
-			$answer = Read-Host "This will overwrite everything in ${install}. Really? (y/n)"
+			$answer = Read-Host "This will overwrite everything in ${install}.`nReally? (y/n)"
 		}
 	}
 	
@@ -473,7 +490,7 @@ function InitWorkWim([string]$init_yn) {
 	} else {
 		while("y","n" -notcontains $answer)
 		{
-			$answer = Read-Host "This will overwrite ${wim_file} with the original ${wim_type}.wim. Do you really want this? (y/n)"
+			$answer = Read-Host "This will overwrite ${wim_file} with the original ${wim_type}.wim.`nDo you really want this? (y/n)"
 		}
 	}
 	

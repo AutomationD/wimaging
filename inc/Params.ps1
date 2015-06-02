@@ -162,15 +162,13 @@ if ($boot -ne $true) {
 		
 		
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
-		#$wim_image_name_setup = "Microsoft Windows Longhorn Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
 
 	} elseif ($os -eq "server-2012r2") {
-		$wim_image_name_pe = "Microsoft Windows Setup (x64)"
+		$wim_image_name_pe = "Microsoft Windows PE (x64)"
 		
 		
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
-		#$wim_image_name_setup = "Microsoft Windows Longhorn Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
 				
 	} elseif ($os -eq "windows-pe-x86")	{

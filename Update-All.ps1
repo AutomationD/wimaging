@@ -13,7 +13,7 @@ if ($os -like "windows-pe-*")
 	AddDrivers $drivers_dir $mount_dir	
 	AddUpdates $update_dir $mount_dir	
 	AddTools $tools_dir $mount_dir	
-	# No Unmount
+	SafeUnmountWim $mount_dir
 }
 else
 {
@@ -41,7 +41,7 @@ else
 		
 		MountWim $wim_file $mount_dir $wim_image_name_pe
 		AddDrivers $drivers_dir $mount_dir
-		UnmountWim $mount_dir
+		SafeUnmountWim $mount_dir
 		
 		MountWim $wim_file $mount_dir $wim_image_name_setup
 		AddDrivers $drivers_dir $mount_dir
@@ -49,7 +49,7 @@ else
 		
 		# This will add additional PE packages
 		AddUpdates $updates_dir $mount_dir
-		UnmountWim $mount_dir
+		SafeUnmountWim $mount_dir
 		
 		
 		#Write-Host "Working on the install image" -foregroundcolor "green"	
@@ -79,30 +79,10 @@ else
 		
 				
 		MountWim $wim_file $mount_dir $wim_image_name
-		AddTools $wim_file $mount_dir $wim_image_name
+		AddTools $tools_dir $mount_dir $wim_image_name
 		Write-Host "Not adding any drivers. They should be injected into boot.wim as well as accessible via CIFS at \\wimagingHost\\install\drivers"
 		#AddDrivers $drivers_dir $mount_dir
 		AddUpdates $updates_dir $mount_dir
+		SafeUnmountWim $mount_dir
 	}
 }
-
-# Add Updates
-
-
-# Commit only on successful update
-if ($lastexitcode -ne 0)
-{
-	Write-Host "Errors found, NOT committing any changes"
-	UnmountWim $mount_dir "n"
-	Write-Error "Wim was as not pushed"
-}
-else
-{
-	Write-Host "No errors found, committing changes"
-	UnmountWim $mount_dir
-	#PushWim $wim_file
-	
-}
-
-
-
