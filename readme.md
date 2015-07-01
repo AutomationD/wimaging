@@ -123,94 +123,99 @@ This templates will be triggered by __wimaging__ at the end of provisioning on t
 [http://<formeanHost>/config_templates](http://<formeanHost>/config_templates) -> _New Template_
 
 - __Provisioning Template__
-    - __Name__: _Windows Default_
+    - __Name__: _WAIK default finish_
     - __Template Editor__:
     ```
-      :: Script is downloaded by c:\wimaging\deploy\10_init.cmd
-      :: Make sure to set all host parameters in Foreman (General/perHost)
+    <%#
+      kind: finish
+      name: WAIK default finish
 
-      :: netUser: username to access CIFS share. For ex. 'username'
-      :: netPassword: username to access to CIFS share. For ex. 'P@ssword'
-      :: netDriveLetter: drive to mount CIFS while provisioning. For ex. 'Z'
-      :: deploymentShare: Hostname/ip address of your CIFS deployment share. For ex. '192.168.10.5'
-      :: foremanServer: Hostname/ip for your foreman server. For ex. '192.168.10.7'
-      :: localUser: Username that will be used for local admin
-      :: localPassword: Password that will be used for local admin
+      # Script is downloaded by c:\wimaging\deploy\10_init.cmd
+      # Parameters are expected to be set in Foreman (globally or per group/host)
+      params:
+      - netUser: username # username to access CIFS share
+      - netPassword: P@ssword # password to access to CIFS share
+      - netDriveLetter: Z # drive to mount CIFS while provisioning
+      - deploymentShare: 192.168.10.5 # Hostname/ip address of your CIFS deployment share
+      - foremanServer: 192.168.10.7 # Hostname/ip for your foreman server
+      - localAdminUser: Administrator # Username that will be used for local admin
+      - localAdminPassword: AdminPassword123 # Password that will be used for local admin
+      - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
+      - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key        
+    %>
+    set netUser=<@= @host.params['netUser'] %>
+    set netPassword=<@= @host.params['netPassword'] %>
+    set netDriveLetter=<@= @host.params['netDriveLetter'] %>
+    set deploymentShare=<@= @host.params['deploymentShare'] %>
+    set foremanServer=<@= @host.params['foremanServer'] %>
 
+    set tempAdminUser=tempAdmin
+    set tempAdminPassword=tempAdminPassword
 
-      set netUser=<@= @host.params['netUser'] %>
-      set netPassword=<@= @host.params['netPassword'] %>
-      set netDriveLetter=<@= @host.params['netDriveLetter'] %>
-      set deploymentShare=<@= @host.params['deploymentShare'] %>
-      set foremanServer=<@= @host.params['foremanServer'] %>
+    net user /add %tempAdminUser% %tempAdminPassword%
+    net localgroup Administrators %tempAdminUser% /add
 
-      set tempAdminUser=tempAdmin
-      set tempAdminPassword=tempAdminPassword
+    <% if @host.params['localAdminUser'] -%>
+      echo Creating local user: <%= @host.params['localAdminUser'] %> 
+      net user /add /logonpasswordchg:yes <%= @host.params['localAdminUser'] %> <%= @host.params['localAdminPassword'] %>
+      net localgroup Administrators <%= @host.params['localAdminUser'] %> /add
+    <% end -%>
 
-      net user /add %tempAdminUser% %tempAdminPassword%
-      net localgroup Administrators %tempAdminUser% /add
+    <% if @host.pxe_build? %>
+      @echo on
+      
+      :: Image Tools Config
+      cd %deployRoot%\
+      ::call config.cmd
 
-      <% if @host.params['localUser'] -%>
-        echo Creating local user: <%= @host.params['localUser'] %> 
-        net user /add /logonpasswordchg:yes <%= @host.params['localUser'] %> <%= @host.params['localPassword'] %>
-        net localgroup Administrators <%= @host.params['localUser'] %> /add
-      <% end -%>
+      (echo Updating time)
+      (sc config w32time start= auto)
+      sc start w32time
+      :ntp_testip
+        ipconfig /renew
+        ping -n 1 %deploymentShare% > NUL
+        if %errorlevel% == 0 goto ntp_testip_ok
+        REM wait 3 sec. and try it again
+        ping -n 3 127.0.0.1 >nul
+        goto ntp_testip
+      :ntp_testip_ok
 
-      <% if @host.pxe_build? %>
-        @echo on
-        
-        :: Image Tools Config
-        cd %deployRoot%\
-        ::call config.cmd
+      echo Ping to %deploymentShare% OK!
+      w32tm /resync
+      w32tm /resync
+      w32tm /resync
 
-        (echo Updating time)
-        (sc config w32time start= auto)
-        sc start w32time
-        :ntp_testip
-          ipconfig /renew
-          ping -n 1 %deploymentShare% > NUL
-          if %errorlevel% == 0 goto ntp_testip_ok
-          REM wait 3 sec. and try it again
-          ping -n 3 127.0.0.1 >nul
-          goto ntp_testip
-        :ntp_testip_ok
+      echo Adding Credentials
+      psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword% cmd /c "cmdkey /add:%deploymentShare% /user:%netUser% /pass:%netPassword%"
 
-        echo Ping to %deploymentShare% OK!
-        w32tm /resync
-        w32tm /resync
-        w32tm /resync
+      echo Install: Start Chocolatey setup
+      cmd /c powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))"
 
-        echo Adding Credentials
-        psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword% cmd /c "cmdkey /add:%deploymentShare% /user:%netUser% /pass:%netPassword%"
+      echo Install: Start Setting Chocolatey environment variables
+      
+      SETX /M PATH "%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+      SETX /M ChocolateyInstall "%ALLUSERSPROFILE%\chocolatey"
+      psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "SETX PATH '%PATH%;%ALLUSERSPROFILE%\chocolatey\bin'"
+      psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "SETX ChocolateyInstall '%ALLUSERSPROFILE%\chocolatey'"
 
-        echo Install: Start Chocolatey setup
-        cmd /c powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))"
+      echo Install powershell 3
+      call %ALLUSERSPROFILE%\Chocolatey\bin\choco install powershell -y
 
-        echo Install: Start Setting Chocolatey environment variables
-        
-        SETX /M PATH "%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
-        SETX /M ChocolateyInstall "%ALLUSERSPROFILE%\chocolatey"
-        psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "SETX PATH '%PATH%;%ALLUSERSPROFILE%\chocolatey\bin'"
-        psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "SETX ChocolateyInstall '%ALLUSERSPROFILE%\chocolatey'"
+      echo Install puppet agent via chocolatey
+      call %ALLUSERSPROFILE%\Chocolatey\bin\choco install puppet -installargs "PUPPET_MASTER_SERVER=<%= @host.puppetmaster %>PUPPET_AGENT_ENVIRONMENT='<%= @host.environment %>' PUPPET_AGENT_STARTUP_MODE=Manual" -y
 
-        echo Install powershell 3
-        call %ALLUSERSPROFILE%\Chocolatey\bin\choco install powershell -y
+      echo Running initial puppet agent for %tempAdminUser% user
+      cd "C:\Program Files (x86)\Puppet Labs\Puppet\bin"
+      psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "puppet.bat agent --test --debug"
 
-        echo Install puppet agent via chocolatey
-        call %ALLUSERSPROFILE%\Chocolatey\bin\choco install puppet -installargs "PUPPET_MASTER_SERVER=<%= @host.puppetmaster %>PUPPET_AGENT_ENVIRONMENT='<%= @host.environment %>' PUPPET_AGENT_STARTUP_MODE=Manual" -y
+      echo Starting Puppet Agent Service
+      (sc start puppet) && echo Service Start OK
 
-        echo Running initial puppet agent for %tempAdminUser% user
-        cd "C:\Program Files (x86)\Puppet Labs\Puppet\bin"
-        psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "puppet.bat agent --test --debug"
+      echo Setup puppet to run on system reboot
+      sc config puppet start= auto
 
-        echo Starting Puppet Agent Service
-        (sc start puppet) && echo Service Start OK
-
-        echo Setup puppet to run on system reboot
-        sc config puppet start= auto
-
-        echo Creating rebootOne task  
-        psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "schtasks /create /tn rebootOne /tr %deployRoot%\50_rebootOne.cmd > %logRoot%\50_rebootOne.log /sc onstart /ru %tempAdminUser% /rp %tempAdminPassword%"
+      echo Creating rebootOne task  
+      psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword%  cmd /c "schtasks /create /tn rebootOne /tr %deployRoot%\50_rebootOne.cmd > %logRoot%\50_rebootOne.log /sc onstart /ru %tempAdminUser% /rp %tempAdminPassword%"
 
       :: You can join your machine to the domain right here >
       
@@ -221,7 +226,7 @@ This templates will be triggered by __wimaging__ at the end of provisioning on t
 
       echo The rest of setup will continue after reboot (50_rebootOne.cmd)
       shutdown -r
-    <% end -%>
+    <% end -%>    
     ```
 - __Type__
     - __Snippet__: no
@@ -317,7 +322,7 @@ This partition table will create Windows Server 2008 R2 and higher compatible pa
 [http://foremanHost/media](http://foremanHost/media) -> _New Medium_
 - __Medium__
     - __Name__: _Windows Server 2012 R2 Standard_
-    - __Path__: [http://wimagingHost/install/server-2012r2/server-2012r2x64.standard](http://wimagingHost/install/server-2012r2/server-2012r2x64.standard)
+    - __Path__: [http://wimagingHost/install/server-2012r2x64.standard](http://wimagingHost/install/server-2012r2x64.standard)
     - __OS Family__: _Windows_
 
 - __Locations__
