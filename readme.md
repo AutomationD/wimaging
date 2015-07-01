@@ -123,12 +123,12 @@ This templates will be triggered by __wimaging__ at the end of provisioning on t
 [http://<formeanHost>/config_templates](http://<formeanHost>/config_templates) -> _New Template_
 
 - __Provisioning Template__
-    - __Name__: _WAIK default finish_
+    - __Name__: _WAIK default_
     - __Template Editor__:
     ```
     <%#
       kind: finish
-      name: WAIK default finish
+      name: WAIK default
 
       # Script is downloaded by c:\wimaging\deploy\10_init.cmd
       # Parameters are expected to be set in Foreman (globally or per group/host)
