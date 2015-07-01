@@ -266,7 +266,153 @@ This template will be used when we start our setup.
     - __Name__: _Windows unattend.xml_
     - __Template Editor__:
     ```
-    <xml>...
+    <%#
+      kind: provision
+      name: WAIK default unattend.xml
+      
+      # Parameters are expected to be set in Foreman (globally or per group/host)
+      params:
+      - netUser: username # username to access CIFS share
+      - netPassword: P@ssword # password to access to CIFS share
+      - netDriveLetter: Z # drive to mount CIFS while provisioning
+      - deploymentShare: 192.168.10.5 # Hostname/ip address of your CIFS deployment share
+      - foremanServer: 192.168.10.7 # Hostname/ip for your foreman server
+      - localAdminUser: Administrator # Username that will be used for local admin
+      - localAdminPassword: AdminPassword123 # Password that will be used for local admin
+      - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
+      - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key   
+    %>
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <unattend xmlns="urn:schemas-microsoft-com:unattend">
+        <servicing></servicing>
+        <settings pass="offlineServicing">
+            <component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <EnableLUA>false</EnableLUA>
+            </component>
+        </settings>
+        <settings pass="windowsPE">
+            <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <EnableFirewall>false</EnableFirewall>
+                <EnableNetwork>true</EnableNetwork>
+                <Restart>Restart</Restart>
+                <%= @host.diskLayout %>
+                <ImageInstall>
+                    <OSImage>
+                        <InstallFrom>
+                        
+                            <MetaData wcm:action="add">
+                                <Key>/IMAGE/NAME</Key>     
+                                <% if @host.medium.path == "http://"+@host.params['deploymentShare'] + "/install/server-2008r2x64.standard/" -%>
+                                    <Value>Windows Server 2008 R2 SERVERSTANDARD</Value>   
+                                <% elsif @host.medium.path == "http://"+@host.params['deploymentShare'] + "/install/server-2008r2x64.enterprise" -%>
+                                     <Value>Windows Server 2008 R2 SERVERENTERPRISE</Value>
+                                <% elsif @host.medium.path == "http://"+@host.params['deploymentShare'] + "/install/server-2012r2x64.standard" -%>
+                                    <Value>Windows Server 2012 R2 SERVERSTANDARD</Value>   
+                                <% end -%>        
+                            </MetaData>
+                        </InstallFrom>
+                        <InstallToAvailablePartition>true</InstallToAvailablePartition>
+                        <WillShowUI>OnError</WillShowUI>
+                    </OSImage>
+                </ImageInstall>
+                <UserData>
+                    <AcceptEula>true</AcceptEula>
+                </UserData>
+            </component>
+            <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <SetupUILanguage>
+                    <UILanguage>en-US</UILanguage>
+                </SetupUILanguage>
+                <InputLocale>en-US</InputLocale>
+                <SystemLocale>en-US</SystemLocale>
+                <UILanguageFallback>en-US</UILanguageFallback>
+                <UILanguage>en-US</UILanguage>
+                <UserLocale>en-US</UserLocale>
+            </component>
+        </settings>
+        <settings pass="oobeSystem">
+            <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <InputLocale>en-US</InputLocale>
+                <SystemLocale>en-US</SystemLocale>
+                <UILanguage>en-US</UILanguage>
+                <UILanguageFallback>en-US</UILanguageFallback>
+                <UserLocale>en-US</UserLocale>
+            </component>
+            <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+
+                <UserAccounts>
+                    <AdministratorPassword>
+                        <%= Base64.encode64(Encoding::Converter.new("UTF-8", "UTF-16LE",:undef => nil).convert(@host.params['localAdminPassword']+"AdministratorPassword")).delete!("\n").chomp %>
+                        <PlainText>false</PlainText>
+                    </AdministratorPassword>                
+                </UserAccounts>
+                
+                <TimeZone>Pacific Standard Time</TimeZone>
+                <% if @host.params['windowsLicenseOwner'] -%>
+                    <RegisteredOrganization><%= @host.params['windowsLicenseOwner'] %></RegisteredOrganization>
+                    <RegisteredOwner><%= @host.params['windowsLicenseOwner'] %></RegisteredOwner>
+                <% end -%>
+                <OOBE>
+                    <HideEULAPage>true</HideEULAPage>
+                    <NetworkLocation>Work</NetworkLocation>
+                    <ProtectYourPC>1</ProtectYourPC>
+                    <SkipUserOOBE>true</SkipUserOOBE>
+                    <SkipMachineOOBE>true</SkipMachineOOBE>
+                </OOBE>
+                <ShowWindowsLive>false</ShowWindowsLive>            
+                <% if @host.params['windowsLicenseKey'] -%>
+                    <ProductKey><%= @host.params['windowsLicenseKey'].to_s %></ProductKey>
+                <% end -%>
+            </component>
+        </settings>
+        <settings pass="specialize">
+            <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <InputLocale>en-US</InputLocale>
+                <SystemLocale>en-US</SystemLocale>
+                <UILanguage>en-US</UILanguage>
+                <UILanguageFallback>en-US</UILanguageFallback>
+                <UserLocale>en-US</UserLocale>
+            </component>
+            <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <IEHardenAdmin>false</IEHardenAdmin>
+            </component>
+            <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <ComputerName><%= @host.shortname %></ComputerName>
+                <% if @host.params['windowsLicenseOwner'] -%>
+                    <RegisteredOrganization><%= @host.params['windowsLicenseOwner'] %></RegisteredOrganization>
+                    <RegisteredOwner><%= @host.params['windowsLicenseOwner'] %></RegisteredOwner>
+                <% end -%>
+                <TimeZone>Pacific Standard Time</TimeZone>
+            </component>
+            <component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <DomainProfile_EnableFirewall>false</DomainProfile_EnableFirewall>
+                <PrivateProfile_EnableFirewall>false</PrivateProfile_EnableFirewall>
+                <PublicProfile_EnableFirewall>false</PublicProfile_EnableFirewall>
+            </component>
+            <component name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <DoNotOpenServerManagerAtLogon>true</DoNotOpenServerManagerAtLogon>
+            </component>
+            <component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <fDenyTSConnections>false</fDenyTSConnections>
+            </component>
+            <component name="Microsoft-Windows-TerminalServices-RDP-WinStationExtensions" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <SecurityLayer>1</SecurityLayer>
+                <UserAuthentication>0</UserAuthentication>
+            </component>
+        </settings>
+        <settings pass="offlineServicing">
+            <component name="Microsoft-Windows-PnpCustomizationsNonWinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <DriverPaths>
+                    <!--<PathAndCredentials wcm:action="add" wcm:keyValue="1">
+                        
+                        <Path>c:\drivers</Path>
+                    </PathAndCredentials>-->
+                </DriverPaths>
+            </component>
+        </settings>
+    </unattend>
     ```
 - __Type__
     - __Snippet__: no
