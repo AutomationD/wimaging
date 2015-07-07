@@ -20,10 +20,6 @@ if ($boot) {
 	$wim_type = 'install'
 }
 
-if ($imagex -eq $null) {
-    $imagex = "${script_path}\tools\boot.root\wimaging\utils\imagex\imagex.exe"
-}
-
 if ($windows_adk_path -eq $null) {
 	if ($os -eq "server-2012r2") {
 		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
@@ -45,11 +41,20 @@ if ($drivers_dir -eq $null) {
 	$drivers_dir = "${script_path}\install\drivers"
 }
 
+
 if ($dism -eq $null) {
 	if ($os -eq "server-2012r2") {
 		$dism = "${windows_adk_path}\Deployment Tools\${arch}\DISM\dism.exe"
 	} else {
 		$dism = 'dism.exe'
+	}	
+}
+
+if ($imagex -eq $null) {
+	if ($os -eq "server-2012r2") {
+		$imagex = "${windows_adk_path}\Deployment Tools\${arch}\DISM\imagex.exe"
+	} else {
+		$imagex = 'imagex.exe'
 	}	
 }
 
