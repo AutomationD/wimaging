@@ -2,6 +2,7 @@
 # Available options:
 #############################
 # server-2008r2
+# win7x64
 # windows-pe-x64
 # TODO: server-2012
 # TODO: server-2012r2
@@ -11,9 +12,15 @@ $os = "server-2008r2"
 # Edition
 # Available options:
 #############################
-# standard
-# enterprise
-# datacenter
+# server-*:
+# - standard
+# - enterprise
+# - datacenter
+# win7x64
+# - homebasic
+# - homepremium
+# - professional
+# - ultimate
 #############################
 $edition = "enterprise"
 
