@@ -58,7 +58,9 @@ if ($imagex -eq $null) {
 	}	
 }
 
-if ($sources_root -ne $nul) {
+if ($sources -ne $nul) {
+	$sources = "${sources}"
+} elseif ($sources_root -ne $nul) {
 	$sources = "${sources_root}\${os}"
 } else {
 	$sources = "${script_path}\sources\${os}"		
