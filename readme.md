@@ -27,7 +27,7 @@ Rename ```.\inc\Config.ps1.sample``` ```.\inc\Config.ps1``` and set some paramet
 - __$wsus_offline_dir__: directory where locally downloaded windows updates reside (for ex.: ```$wsus_offline_dir = "c:\wsusoffline\client"```)
 - $system_reserved_mount: Letter for mounting a "System reserved" partition of your vhd (pick any drive letter that is not used)
 - $c_drive_mount: Letter for mounting "C: Drive" partition of your vhd (pick any drive letter that is not used)
-- $iso_file: Location of the ISO file containing the OS installation media OPTIONAL, but saves some disk space if you already host the ISOs on your fileserver.
+- $iso_file: Location of the ISO file containing the OS installation media. OPTIONAL, but saves some disk space if you already host the ISOs on your fileserver. Requires imdisk - ```choco install imdisk```
 
 ## Config.cmd
 File is used during actual installation and is copied into the image as a part of the minimal toolset
