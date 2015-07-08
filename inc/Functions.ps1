@@ -472,8 +472,10 @@ function InitInstallSources([string]$init_yn) {
 			}
 	    "y" {
 	    	
-	    			if ($iso_file -ne $nul) {
+	    		if ($iso_file -ne $nul) {
 					$sources = MountISO($iso_file)
+					. '.\inc\Params.ps1'
+					. '.\inc\Functions.ps1'
 				}
 				
 				Write-Host "Initializing ${sources} to ${install}"
@@ -516,8 +518,22 @@ function InitWorkWim([string]$init_yn) {
 					Write-Host "Found ${script_path}\images\${os}\work. Moving on."
 				}
 				
+				if ($iso_file -ne $nul) {
+					$sources = MountISO($iso_file)
+					. '.\inc\Params.ps1'
+					. '.\inc\Functions.ps1'
+				}
 				Write-Host "Initializing ${wim_file} from ${sources_wim_file}"
 				Copy-File $sources_wim_file $wim_file -Force
+				
+				# Clear read-only flag from the wim_file
+				$attr = get-item $wim_file
+				$attr.attributes = 'Normal'
+								
+				if ($iso_file -ne $nul) {
+					UnmountISO($sources)
+				}
+				
 				if ($lastexitcode -ne 0) {
 					Write-Host "Something went wrong, maybe not clean unmount?"
 					UnmountWim($mount_dir, $commit_yn = "n")
