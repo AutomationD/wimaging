@@ -21,7 +21,7 @@ if ($boot) {
 }
 
 if ($windows_adk_path -eq $null) {
-	if ($os -eq "server-2012r2") {
+	if ($os -eq "server-2012r2" -or $os -eq "win7x64") {
 		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
 	} else {
 		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit"
@@ -43,7 +43,7 @@ if ($drivers_dir -eq $null) {
 
 
 if ($dism -eq $null) {
-	if ($os -eq "server-2012r2") {
+	if ($os -eq "server-2012r2" -or $os -eq "win7x64") {
 		$dism = "${windows_adk_path}\Deployment Tools\${arch}\DISM\dism.exe"
 	} else {
 		$dism = 'dism.exe'
@@ -51,7 +51,7 @@ if ($dism -eq $null) {
 }
 
 if ($imagex -eq $null) {
-	if ($os -eq "server-2012r2") {
+	if ($os -eq "server-2012r2" -or $os -eq "win7x64") {
 		$imagex = "${windows_adk_path}\Deployment Tools\${arch}\DISM\imagex.exe"
 	} else {
 		$imagex = 'imagex.exe'
@@ -127,10 +127,26 @@ if ($boot -ne $true) {
 			$wim_index = 2
 			$wim_image_name = "Windows Server 2012 R2 SERVERSTANDARD"
 		}
+	} elseif ($os -eq "win7x64") {
+        	# Directory where the updates are located
+		$updates_dir = $wsus_offline_dir+"\w61-x64\glb"
+		if ($edition -eq "homebasic") {
+			# Index of the actual image in the original install.wim
+            		$wim_index = 1
+			$wim_image_name = "Windows 7 HOMEBASIC"
+		} elseif ($edition -eq "homepremium") {
+			$wim_index = 2
+			$wim_image_name = "Windows 7 HOMEPREMIUM"
+		} elseif ($edition -eq "professional") {
+			$wim_index = 3
+			$wim_image_name = "Windows 7 PROFESSIONAL"
+		} elseif ($edition -eq "ultimate") {
+			$wim_index = 4
+			$wim_image_name = "Windows 7 ULTIMATE"
+		}
 	} elseif ($os -like "*-pe-*") {
 		$updates_dir = $pe_features_root			
 	}
-
 
 } else {
 	# boot.wim file
@@ -175,7 +191,12 @@ if ($boot -ne $true) {
 		
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
-				
+
+	} elseif ($os -eq "win7x64") {
+		$wim_image_name_pe = "Microsoft Windows PE (x64)"
+		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
+		$wim_image_name = $wim_image_name_setup
+
 	} elseif ($os -eq "windows-pe-x86")	{
 		
         # Wim file that scripts process (AddTools, AddFeature, etc)
@@ -190,6 +211,3 @@ if ($boot -ne $true) {
 if (-not(Test-Path -PathType Container $save_dir)) {
 	New-Item -ItemType Directory -Path $save_dir
 }
-
-
-
