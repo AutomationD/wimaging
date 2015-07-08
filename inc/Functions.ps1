@@ -218,7 +218,7 @@ function UnmountWim([string]$mount_dir, [string]$commit_yn = "y") {
 function MountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name) {
 	#Command to mount the WIM
 	Write-Host "Mounting ${wim_file} to ${mount_dir}, Image: ${wim_image_name}. Boot image: ${boot}" -foregroundcolor "Magenta"
-	Invoke-Expression “& ‘$dism’ /mount-wim /wimfile:$wim_file /mountdir:$mount_dir /name:‘$wim_image_name’”	
+	Invoke-Expression "& 'dism' /mount-wim /wimfile:$wim_file /mountdir:$mount_dir /name:'$wim_image_name'"	
 	if ($lastexitcode -ne 0) {
 		Write-Host "Error. Trying to Unmount current (no commit)" -foregroundcolor "Yellow"
 		UnmountWim $mount_dir "n"
@@ -230,7 +230,7 @@ function MountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name
 
 function GetWimInfo([string]$wim_file) {
 	# Get Information using imagex	
-	Invoke-Expression “& ‘$imagex’ /info $wim_file”	
+	Invoke-Expression "& '$imagex' /info $wim_file"	
 	if ($lastexitcode -ne 0) {
 		Write-Error "Error ${lastexitcode}"
 		exit $lastexitcode
@@ -365,8 +365,8 @@ function GetCapturedWim([string]$captured_wim,[string]$wim_file) {
 }
 
 function GetFeatures([string]$mount_dir) {	
-	Invoke-Expression "& ‘$dism’ /Image:$mount_dir /Get-Features /Format:Table"
-	Invoke-Expression "& ‘$dism’ /Image:$mount_dir /Get-Packages /Format:Table"
+	Invoke-Expression "& '$dism' /Image:$mount_dir /Get-Features /Format:Table"
+	Invoke-Expression "& '$dism' /Image:$mount_dir /Get-Packages /Format:Table"
 }
 
 function MountUnmountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name) {
@@ -480,7 +480,7 @@ function InitInstallSources([string]$init_yn) {
 				Copy-Item $(Join-Path $sources "\*") $install -Force -Recurse
 				
 				if ($iso_file -ne $nul) {
-					UnmountISO($iso_file)
+					UnmountISO($sources)
 				}
 				
 				Write-Host "Install directory for ${os} has been refreshed. Make sure to push latest images to it." -foreground "green"				
@@ -843,26 +843,21 @@ function CreateVM([string]$os) {
 #     --port 1 --device 0 --type dvddrive --medium debian-6.0.2.1-i386-CD-1.iso
 }
 
-function MountISO([string]$iso_file) {
-	Write-Host "Mounting ${iso_file}" -foregroundcolor "Magenta"
-	Mount-DiskImage -ImagePath "$iso_file" -StorageType ISO
-	$driveLetter = (Get-DiskImage -ImagePath $iso_file | Get-Volume).DriveLetter
-
-	if ($lastexitcode -ne 0) {
-		Write-Host "Error mounting ${iso_file}: ${lastexitcode}" -foregroundcolor red
-		exit $lastexitcode
-	} else {	
-		return "$driveLetter:\"
-	}
+function MountISO([string] $isoPath)
+{
+	if ( -not (Test-Path $isoPath)) { throw "$isoPath does not exist" }
+	
+	$driveLetter = ls function:[i-z]: -n | ?{ !(test-path $_) } | random
+	Write-Host "Mounting $isoPath using ImDisk"
+	(& "imdisk" -a -f $isoPath -m $driveLetter) | out-null
+	return ($driveLetter + "\")
 }
 
 
-function UnmountISO([string]$iso_file) {
-	Write-Host "Unmounting ${iso_file}" -foregroundcolor "Magenta"
-	Dismount-DiskImage -ImagePath $iso_file
-	
-	if ($lastexitcode -ne 0) {
-		Write-Host "Error unmounting ${iso_file}: ${lastexitcode}" -foregroundcolor red
-		exit $lastexitcode
-	}
+function UnmountISO([string] $driveLetter)
+{
+	start-sleep -s 5
+ 
+	Write-Host "Unmounting $driveLetter using ImDisk"
+	(& "imdisk" -D -m ($driveLetter.Replace("\",""))) | out-null
 }
