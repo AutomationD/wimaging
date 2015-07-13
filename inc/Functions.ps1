@@ -239,10 +239,12 @@ function GetWimInfo([string]$wim_file) {
 
 function AddDrivers([string]$drivers_dir, [string]$mount_dir) {
 	
-	#Command to mount the WIM
-	Write-Host "Adding Drivers" -foregroundcolor "yellow"
-	Write-Host "${drivers_dir} -> ${mount_dir}"
-	Invoke-Expression "& '$dism' /Image:$mount_dir /Add-Driver /Driver:$drivers_dir /Recurse"
+	if (Test-Path -PathType Container $drivers_dir) {
+		#Command to mount the WIM
+		Write-Host "Adding Drivers" -foregroundcolor "yellow"
+		Write-Host "${drivers_dir} -> ${mount_dir}"
+		Invoke-Expression "& '$dism' /Image:$mount_dir /Add-Driver /Driver:$drivers_dir /Recurse"
+	}
 	
 }
 
