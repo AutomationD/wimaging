@@ -34,7 +34,7 @@ $boot = $false
 #$captured_wims_dir = ""
  
 # Directory where windows distributions reside. Must be a directory that is served from a network share. 
-#$windows_install_root = ""
+#$install_root = ""
 
 # Path to drivers directory, default .\install\drivers
 #$drivers_dir = ""
