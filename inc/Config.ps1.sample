@@ -32,6 +32,9 @@ $boot = $false
 # Path to drivers directory, default .\install\drivers
 #$drivers_dir = ""
 
+# Path to language packs directory, default .\install\langpacks
+#$langpacks_dir = ""
+
 # DISM Location, default 'dism.exe'
 #$dism = ""
 

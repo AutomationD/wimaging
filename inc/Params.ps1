@@ -41,6 +41,9 @@ if ($drivers_dir -eq $null) {
 	$drivers_dir = "${script_path}\install\drivers"
 }
 
+if ($langpacks_dir -eq $null) {
+	$langpacks_dir = "${script_path}\install\langpacks"
+}
 
 if ($dism -eq $null) {
 	if ($os -eq "server-2012r2") {
