@@ -218,7 +218,7 @@ function UnmountWim([string]$mount_dir, [string]$commit_yn = "y") {
 function MountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name) {
 	#Command to mount the WIM
 	Write-Host "Mounting ${wim_file} to ${mount_dir}, Image: ${wim_image_name}. Boot image: ${boot}" -foregroundcolor "Magenta"
-	Invoke-Expression “& ‘$dism’ /mount-wim /wimfile:$wim_file /mountdir:$mount_dir /name:‘$wim_image_name’”	
+	Invoke-Expression "& 'dism' /mount-wim /wimfile:$wim_file /mountdir:$mount_dir /name:'$wim_image_name'" 
 	if ($lastexitcode -ne 0) {
 		Write-Host "Error. Trying to Unmount current (no commit)" -foregroundcolor "Yellow"
 		UnmountWim $mount_dir "n"
@@ -230,7 +230,7 @@ function MountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name
 
 function GetWimInfo([string]$wim_file) {
 	# Get Information using imagex	
-	Invoke-Expression “& ‘$imagex’ /info $wim_file”	
+	Invoke-Expression "& '$imagex' /info $wim_file" 
 	if ($lastexitcode -ne 0) {
 		Write-Error "Error ${lastexitcode}"
 		exit $lastexitcode
@@ -365,8 +365,8 @@ function GetCapturedWim([string]$captured_wim,[string]$wim_file) {
 }
 
 function GetFeatures([string]$mount_dir) {	
-	Invoke-Expression "& ‘$dism’ /Image:$mount_dir /Get-Features /Format:Table"
-	Invoke-Expression "& ‘$dism’ /Image:$mount_dir /Get-Packages /Format:Table"
+	Invoke-Expression "& '$dism' /Image:$mount_dir /Get-Features /Format:Table"
+	Invoke-Expression "& '$dism' /Image:$mount_dir /Get-Packages /Format:Table"
 }
 
 function MountUnmountWim([string]$wim_file, [string]$mount_dir, [string]$wim_image_name) {
