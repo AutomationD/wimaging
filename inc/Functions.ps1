@@ -267,8 +267,10 @@ function AddUpdates([string]$updates_dir, [string]$mount_dir, [string]$wim_image
 		#Array to hold package locations
 		$package_path = @()
 		
-		Write-Host "Installing .Net 3.5 from $sources"
-		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all /source:$sources\sources\sxs"
+		if (Test-Path -PathType Container $sources\sources\sxs) {
+			Write-Host "Installing .Net 3.5 from $sources"
+			Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all /source:$sources\sources\sxs"
+		}
 
 		InstallPackages($updates_dir)
 	} else {
