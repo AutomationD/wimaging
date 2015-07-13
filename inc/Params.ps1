@@ -191,5 +191,8 @@ if (-not(Test-Path -PathType Container $save_dir)) {
 	New-Item -ItemType Directory -Path $save_dir
 }
 
+if (-not(Test-Path -PathType Container $install)) {
+	New-Item -ItemType Directory -Path $install
+}
 
 
