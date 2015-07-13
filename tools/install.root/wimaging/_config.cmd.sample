@@ -1,4 +1,5 @@
 :: Image Tools Config File
+set deployRoot=%wimagingRoot%\deploy
 set logfile=c:\SetupDebug.log
 set deployment=deployment.company.com
 set username=domain\deployment-user
