@@ -1,11 +1,10 @@
 :: Image Tools Config File
+set wimagingRoot=c:\wimaging
 set deployRoot=%wimagingRoot%\deploy
-set logfile=c:\SetupDebug.log
-set deployment=deployment.company.com
-set username=domain\deployment-user
-set password=Depl0ymntPass
-set foremanserver=foreman.company.com
-set dotnetsetupexe=\\%deployment%\deployment\dotnet\dotnetfx40_full_x86_x64.exe
+set logfile=c:\wimaging\SetupDebug.log
 
 :: Add %deployRoot% to the PATH
 set PATH=%PATH%;%deployRoot%
+
+:: foremanserver is now set by the pre-install script
+:: and a new line is added here
