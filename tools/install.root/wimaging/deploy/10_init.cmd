@@ -2,9 +2,6 @@
 cd /d %~dp0
 call %wimagingRoot%\_config.cmd
 
-echo Adding credentials for %deployment%
-cmdkey /add:%deployment% /user:%username% /pass:%password%
-
 echo Downloading 20_finish.cmd
 cscript.exe //NoLogo %deployRoot%\wget.vbs http://%foremanserver%/unattended/finish %deployRoot%\finish_unix.cmd
 
