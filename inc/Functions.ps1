@@ -270,7 +270,7 @@ function DelFeatures([string]$mount_dir, [array]$features) {
 	} else {
 		foreach($feature In $features) {
 			Write-Host "Removing feature $feature"
-		  	Invoke-Expression "& '$dism' /image:$mount_dir /Disable-Feature /FeatureName:'$feature' /all"
+		  	Invoke-Expression "& '$dism' /image:$mount_dir /Disable-Feature /FeatureName:'$feature'"
 		}
 	}
 }
