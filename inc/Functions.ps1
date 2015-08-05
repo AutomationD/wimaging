@@ -256,7 +256,7 @@ function AddFeatures([string]$mount_dir, [array]$features) {
 	} else {
 		foreach($feature In $features) {
 			Write-Host "Adding feature $feature"
-		  	Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:$feature /all"
+		  	Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:'$feature' /all"
 		}
 	}
 }
@@ -270,7 +270,7 @@ function DelFeatures([string]$mount_dir, [array]$features) {
 	} else {
 		foreach($feature In $features) {
 			Write-Host "Removing feature $feature"
-		  	Invoke-Expression "& '$dism' /image:$mount_dir /Disable-Feature /FeatureName:$feature /all"
+		  	Invoke-Expression "& '$dism' /image:$mount_dir /Disable-Feature /FeatureName:'$feature' /all"
 		}
 	}
 }
