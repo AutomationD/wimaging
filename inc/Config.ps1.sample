@@ -54,6 +54,12 @@ $boot = $false
 # WSUS Offline location. Must point to root that contains subfolders for distributions
 $wsus_offline_dir = "e:\wsus_offline"
 
+# Add/enable specific features in the image (array). Use Get-DismFeatures.ps1 to discover available features
+$add_features = "NetFx3"
+
+# Del/disable specific features in the image (array)
+#$del_features = ""
+
 # Sytem Reserved Partition Mount Letter. Used when mounting VHD
 $system_reserved_mount="R"
 

@@ -248,17 +248,32 @@ function AddDrivers([string]$drivers_dir, [string]$mount_dir) {
 	
 }
 
-function AddFeatures([string]$mount_dir) {
+function AddFeatures([string]$mount_dir, [array]$features) {
 	if ($os -like "*-pe-*") {
 		Write-Error "No features in PE version. To add PE Features use AddUpdates"
 		
 
 	} else {
-		Write-Host "Installing .net 3.5"
-		Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all"
+		foreach($feature In $features) {
+			Write-Host "Adding feature $feature"
+		  	Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:$feature /all"
+		}
 	}
 }
 
+
+function DelFeatures([string]$mount_dir, [array]$features) {
+	if ($os -like "*-pe-*") {
+		Write-Error "No features in PE version."
+		
+
+	} else {
+		foreach($feature In $features) {
+			Write-Host "Removing feature $feature"
+		  	Invoke-Expression "& '$dism' /image:$mount_dir /Disable-Feature /FeatureName:$feature /all"
+		}
+	}
+}
 
 function AddUpdates([string]$updates_dir, [string]$mount_dir, [string]$wim_image_name) {
 	Write-Host "Adding Updates" -foregroundcolor "yellow"
