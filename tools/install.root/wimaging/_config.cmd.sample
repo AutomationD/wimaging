@@ -7,5 +7,6 @@ set password=Depl0ymntPass
 set foremanserver=foreman.company.com
 set dotnetsetupexe=\\%deployment%\deployment\dotnet\dotnetfx40_full_x86_x64.exe
 
-:: Add %deployRoot% to the PATH
-set PATH=%PATH%;%deployRoot%
+
+
+
