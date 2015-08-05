@@ -287,16 +287,6 @@ function AddUpdates([string]$updates_dir, [string]$mount_dir, [string]$wim_image
 			Invoke-Expression "& '$dism' /image:$mount_dir /Enable-Feature /FeatureName:NetFx3 /all /source:$sources\sources\sxs"
 		}
 
-		# Language Packs
-		if (Test-Path -PathType Container $langpacks_dir) {
-			$langs = Get-ChildItem "${langpacks_dir}" | where{$_.extension -eq ".msu" -or $_.extension -eq ".cab" }
-			For($i=0; $i -le $langs.Count -1; $i++) {
-				$package = $langs[$i].name
-				Write-Host "Adding Language Pack ${package}"
-				Invoke-Expression "& '$dism' /image:$mount_dir /Add-Package /packagepath:'${langpacks_dir}\${package}'"
-			}
-		}
-
 		InstallPackages($updates_dir)
 	} else {
 		Write-Host "Processing the following packages:"

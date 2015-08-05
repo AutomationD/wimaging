@@ -48,7 +48,6 @@ We will need to share "install" directory via Windows Network Share / CIFS and (
 
 # Create boot.wim with injected storage / network drivers and toolset
 - Copy your drivers to ```.\install\drivers\```
-- Copy your language packs to ```.\install\langpacks\``` (exe2cab them first)
 - Copy ```c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit\Windows Preinstallation Environment\amd64\en-us\winpe.wim``` to ```.\images\wimdows-pe-x64\sources\boot.wim```
 - Edit ```.\inc\Config.ps1```: ```$os = "windows-pe-x64"``` and ```$boot = $true```
 - Edit ```.\tools\boot.root\Windows\System32\startnet.cmd.sample``` with your data and rename it to ```startnet.cmd```
