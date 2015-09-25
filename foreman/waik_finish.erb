@@ -1,0 +1,102 @@
+<%#
+kind: finish
+name: WAIK default
+# Script is downloaded by c:\wimaging\deploy\10_init.cmd
+# Parameters are expected to be set in Foreman (globally or per group/host)
+params:
+- windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
+- windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
+- localAdminiAccountDisabled: false
+- ntpSever: time.windows.com,other.time.server
+- domainAdminAccount: administrator@domain.com # use tthis account to join domain
+- domainAdminAccountPasswd: Password for the domain Admin account
+- computerOU: OU=Computers,CN=domain,CN=com # Place the computer account in specified Organizational Unit
+- computerDomain: domain.com # domain to join
+-%>
+@echo off
+set netUser=<%= @host.params['netUser'] %>
+set netPassword=<%= @host.params['netPassword'] %>
+set netDriveLetter=<%= @host.params['netDriveLetter'] %>
+set deploymentShare=<%= @host.params['deploymentShare'] %>
+set foremanServer=<%= @host.params['foremanServer'] %>
+
+set tempAdminUser=administrator
+set tempAdminPassword=<%= @host.params['localAdminPassword'] %>
+
+echo Activating %tempAdminUser%
+::net user %tempAdminUser% %tempAdminPassword%
+net user %tempAdminUser% /active:yes 
+
+<% if @host.params['localAdminUser'] -%>
+  echo Creating local user: <%= @host.params['localAdminUser'] %> 
+  net user /add /logonpasswordchg:yes <%= @host.params['localAdminUser'] %> <%= @host.params['localAdminPassword'] %>
+  net localgroup Administrators <%= @host.params['localAdminUser'] %> /add
+<% end -%>
+
+<% if @host.pxe_build? %>
+
+  (echo Updating time)
+  (sc config w32time start= auto)
+  sc start w32time
+  :ntp_testip
+    ipconfig /renew
+    ping -n 1 %deploymentShare% > NUL
+    if %errorlevel% == 0 goto ntp_testip_ok
+    REM wait 3 sec. and try it again
+    ping -n 3 127.0.0.1 >nul
+    goto ntp_testip
+  :ntp_testip_ok
+
+  echo Ping to %deploymentShare% OK!
+  <% if @host.params['ntpSever'] %>
+    w32tm /config /manualpeerlist:<%= @host.params['ntpSever'] %> /syncfromflags:manual /update
+  <% end %>
+  w32tm /resync
+  w32tm /resync
+  w32tm /resync
+
+  ::echo Adding Credentials
+  ::psexec.exe -accepteula -h -u %tempAdminUser% -p %tempAdminPassword% cmd /c "cmdkey /add:%deploymentShare% /user:%netUser% /pass:%netPassword%"
+
+  :: You can join your machine to the domain right here >
+  
+  <% if @host.params['domainAdminAccount'] -%>
+  echo joining domain
+  powershell.exe -OutputFormat text -ExecutionPolicy remotesigned -command c:\deploy\joinDomain.ps1
+  <% end %>
+  
+  :: < You can join your machine to the domain right here
+
+  <% if @host.params['localAdminiAccountDisabled'] %>
+      echo Disabling %tempAdminUser%
+      net user %tempAdminUser% %tempAdminUser% /active:no
+  <% end %>
+  
+  echo safely remove files
+  sdelete.exe -accepteula -p 2 -r c:\wimaging 
+  sdelete.exe -accepteula -p 2 c:\Windows\Panther\unattend.xml
+  sdelete.exe -accepteula -p 2 C:\Windows\Setup\Scripts\SetupComplete.cmd
+  sdelete.exe -accepteula -p 2 -r c:\minint
+  sdelete.exe -accepteula -p 2 -r c:\wimaging
+  
+  <% if snippets "WAIK extraFinishCommands" -%>
+  echo Running extra commands
+  <%= snippets "WAIK extraFinishCommands" %>
+  echo cleaning up extras
+  sdelete.exe -accepteula -p 2 -r c:\extras
+  <% end -%>
+  
+  echo Tell foreman build mode has finished
+  wget.exe <%= foreman_url('built') %>
+  
+  sdelete.exe -accepteula -p 2 -r c:\deploy
+  
+  echo remove leftover directories
+  rmdir /s /q c:\wimaging 
+  rmdir /s /q c:\minint 
+  rmdir /s /q c:\deploy 
+  rmdir /s /q c:\extras
+  
+  echo rebooting...
+  shutdown /r /t 5
+<% end -%>

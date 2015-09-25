@@ -1,0 +1,9 @@
+<%#
+kind: PXELinux
+name: WAIK default PXELinux
+%>
+
+DEFAULT menu    
+LABEL menu         
+     COM32 linux.c32 boot/wimboot
+     APPEND initrdfile=<%= @host.operatingsystem.bootfile(@host.arch,:bcd) %>,<%= @host.operatingsystem.bootfile(@host.arch,:bootsdi) %>,<%= @host.operatingsystem.bootfile(@host.arch,:bootwim) %>
