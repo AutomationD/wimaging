@@ -1,7 +1,8 @@
 <%#
 kind: snippet
 name: WAIK extraFinishCommands
-# ALlist of extra commands run at the end of the finish script. Do not change the snippet name
+# Extra commands run at the end of the finish script. Do not change the snippet name
+# make commands are executed synchronously. Otherwise they might get interrupted by reboot later on
 -%>
 @echo off
 echo Installing puppet
