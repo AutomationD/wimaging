@@ -5,10 +5,12 @@ name: WAIK default
 params:
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
+- wimImageName: Windows 8.1 Pro # name of the wim image
 - systemLocale: en-US
 - systemUILanguage: en-US
 - systemTimeZone: Pacific Standard Time #see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx
-%><?xml version="1.0" encoding="utf-8"?>
+-%>
+<?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
     <servicing></servicing>
     <settings pass="offlineServicing">
@@ -26,15 +28,7 @@ params:
                     <InstallFrom>
                         <MetaData wcm:action="add">
                             <Key>/IMAGE/NAME</Key>
-                            <% if @host.medium.path =~ /server-2008r2x64.standard/ -%>
-                                <Value>Windows Server 2008 R2 SERVERSTANDARD</Value>                         
-                            <% elsif @host.medium.path =~ /server-2008r2x64.enterprise/ -%>
-                                 <Value>Windows Server 2008 R2 SERVERENTERPRISE</Value>
-                            <% elsif @host.medium.path =~ /server-2012r2x64.standard/ -%>
-                                <Value>Windows Server 2012 R2 SERVERSTANDARD</Value> 
-                            <% elsif @host.medium.path =~ /win81x64.professional/ -%>
-                                <Value>Windows 8.1 Pro</Value>  
-                            <% end -%>
+                                <Value><%= @host.params['wimImageName'] %></Value>
                         </MetaData>
                     </InstallFrom>
                     <InstallToAvailablePartition>true</InstallToAvailablePartition>
@@ -86,18 +80,6 @@ params:
                     <PlainText>false</PlainText>
                     <Value><%= Base64.encode64(Encoding::Converter.new("UTF-8", "UTF-16LE",:undef => nil).convert(Base64.decode64(root_pass)+"AdministratorPassword")).delete!("\n").chomp %></Value>
                 </AdministratorPassword>
-                <!-- create another local account for debugging; otherwise you might be locked out
-                <LocalAccounts>
-                    <LocalAccount wcm:action="add">
-                        <Password>
-                            <Value>Pa55w@rd=</Value>
-                            <PlainText>true</PlainText>
-                        </Password>
-                        <Name>admin</Name>
-                        <Group>Administrators</Group>
-                    </LocalAccount>
-                </LocalAccounts>
-                -->
             </UserAccounts>
             <TimeZone><%= @host.params['systemTimeZone'] -%></TimeZone>
             <% if @host.params['windowsLicenseOwner'] -%>
@@ -135,7 +117,7 @@ params:
               <UILanguage>en-US</UILanguage>
               <UILanguageFallback>en-US</UILanguageFallback>
               <UserLocale>en-US</UserLocale>
-            <% end -%>       
+            <% end -%>
         </component>
         <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <IEHardenAdmin>false</IEHardenAdmin>
