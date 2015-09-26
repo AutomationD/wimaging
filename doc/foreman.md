@@ -64,7 +64,7 @@ This way `http://winmirror.domain.com/pub/win81x64/extras/puppet.msi` will be st
 - Name: `WAIK local users`
 - Kind: Snippet
 
-___Note:___ This snippet creates extra users in the unattended stage.
+__Note:__ This snippet creates extra users in the unattended stage.
 This may be very useful for debugging early stages of your deployment; since you
 can find yourself locked out of the newly provisioned host.
 
@@ -72,7 +72,7 @@ can find yourself locked out of the newly provisioned host.
 - Name: `WAIK extraFinishCommands`
 - Kind: Snippet
 
-__Note:___ The commands here are executed at the last stage just before finishing host building.
+__Note:__ The commands here are executed at the last stage just before finishing host building.
 Make sure they get executed in a synchronous way (eg. do not run in background like msiexec).
 Otherwise the following reboot might kill them.
 
@@ -104,7 +104,7 @@ required and have defaults. For the most up to date desciption see the template 
 The following parameters are only applied if they exist. Some, like `domainAdminAccount` and `domainAdminAccountPasswd` require each other, tough.
 - `systemLocale`: en-US
 - `systemUILanguage`: en-US
-- `systemTimeZone`: Pacific Standard Time - see [MS TimeZone Naming]()https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx)
+- `systemTimeZone`: Pacific Standard Time - see [MS TimeZone Naming](https://msdn.microsoft.com/en-us/library/ms912391%28v=winembedded.11%29.aspx)
 - `localAdminiAccountDisabled`: false - will keep the local administrator account disabled (default windows)
 - `ntpSever`: time.windows.com,other.time.server - ntp server to use
 - `domainAdminAccount`: administrator@domain.com - use this account to join the computer to a domain
@@ -120,8 +120,3 @@ The templates most likely need a lot of testing to work. This is not covered her
 2. Continue with VMs to test netbooting and basic installation
 3. Debug `peSetup.cmd` by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
 4. Examine the log left from the finish script; `C:\foreman.log.`. Also, remove comment out the clean up stage in the finish script to examine and test it.
-
-
-
-
-
