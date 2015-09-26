@@ -28,7 +28,8 @@ The tasks can be broken down in two steps:
 An outline of the process to better understand the tasks witch need to be done. Basically, there are three phases:
 
 ### Phase I
-1. Create a new host in Foreman
+1. Create a new host in Foreman.
+
 Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/theforeman/foreman_discovery) is recommended.
 
 ### Phase II
@@ -39,16 +40,16 @@ Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/thef
   5. `unattend.xml` (`foreman_url('provision')`) is download and applied using `dism.exe`
   6. Drivers are download and added using `dism.exe`
   6. Required tools are added to the new host (most prominently `wget`)
-  6. Optionally, download extra software (like puppet.msi)
-  6. Optionally, domain join powershell script (`foreman_url('user_data')`) is download
+  6. Optionally, download extra software (like puppet)
+  6. Optionally, domain join script (`foreman_url('user_data')`)
   7. The finish script (`foreman_url('finish')`) is download and 'armed'
 8. reboot to new OS
 
 ### Phase III
 1. Windows native finish tasks are done ('starting devices...')
-1. Once done, the finish script gets executed:
-  1. Optionally, the local administrator account is activated
+1. The finish script gets called by [`SetupComplete.cmd`](https://technet.microsoft.com/en-us/library/cc766314%28v=ws.10%29.aspx)
   1. Set the time server; sync time
+  2. Optionally, the local administrator account is activated
   2. Optionally, join domain
   3. Optionally, execute extra scripts (eg, install puppet)
   3. Securely cleanup (sensitive) scripts using [`SDelete.exe`](https://technet.microsoft.com/de-de/sysinternals/bb897443.aspx)
