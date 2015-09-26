@@ -27,20 +27,20 @@ $os = "server-2008r2"
 #############################
 $edition = "enterprise"
 
-# If managing a boot image ($true or $false)
-$boot = $false
+# If managing both a boot image and install image ($true or $false)
+$boot = $true
 
 # Directory that will be used to mount wim files for processing. Default is $mount_dir = $script_path +"\" + $os + "\mount"
 #$mount_dir = ""
 
 # Directory that will be used to output captured wims (and further processing). Uses images\$os\captured by default
 #$captured_wims_dir = ""
- 
-# Directory where windows distributions reside. Must be a directory that is served from a network share. 
+
+# Directory where windows distributions reside. Must be a directory that is served from a network share.
 #$install_root = ""
 
 # Path to drivers directory, default .\install\drivers
-#$drivers_dir = ""
+#$drivers_dir = "${script_path}\install\${os}\drivers"
 
 # DISM Location, default 'dism.exe'
 #$dism = ""
