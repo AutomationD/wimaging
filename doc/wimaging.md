@@ -77,7 +77,7 @@ Alternatively, you can run each step separately with the respective commands. Th
 __Notes___: The file server must share these files via `http://` and/or `ftp://`. Test if this share is accessible. If you like, you can use the same host; for instance by stalling IIS (not covered).
 
 ## V. Configure Foreman
-Head on to [configuring Foreman](doc/foreman.md) section.
+Head on to [configuring Foreman](foreman.md) section.
 
 
 # Advanced wimaging
@@ -96,5 +96,3 @@ In case you are working with 2008 R2 - the process is a little bit different (be
 - Install OS using iso on the VM (Point your virtual DVD to the iso you downloaded, Don't worry about partitioning right now - everything will be wiped)
 - Shutdown the VM, add tools using Add-Tools.ps1
 - Start the VM back and run in it c:/wimaging/image/10_start.cmd - this will install updates and sysprep your box. It will shut it down is well.
-
-
