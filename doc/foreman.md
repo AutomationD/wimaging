@@ -98,6 +98,16 @@ __Note:__ The commands here are executed at the last stage just before finishing
 Make sure they get executed in a synchronous way (eg. do not run in background like msiexec).
 Otherwise the following reboot might kill them.
 
+#### WAIK OU from Hostgroup
+- Name: `WAIK OU from Hostgroup`
+- Kind: Snippet
+
+__Note__: This snippet may be used to generate the computer OU from the host's hostgroup and domain.
+
+Example: Imagine host `example` in domain `ad.corp.com` and in hostgroup `servers/windows/databases`.
+The snippet generates the OU path:
+`OU=databases,OU=windows,OU=servers,DC=ad,DC=corp,DC=com`. Optionally, set the host parameter `computerOuSuffix` to add some arbitrary OU at the end.
+
 ## IV. Add installation media
 For each of your Windows versions add a new installation media pointing to the root of the folder.
 Eg, `http://winmirror.domain.com/pub/win81x64`. Assign them to your operatingsystem.
@@ -136,12 +146,13 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 - `domainAdminAccount`: administrator@domain.com - use this account to join the computer to a domain
 - `domainAdminAccountPasswd`: Pa55w@rd - Password for the domain Admin account
 - `computerOU`: OU=Computers,CN=domain,CN=com - Place the computer account in specified Organizational Unit
+- `computerOuSuffix`: Used if `computerOU` is not present to generate the computer OU from hostgroup and hostdomain. `computerOU` takes precedence! Note, the OU must still be manually created in active directory.
 - `computerDomain`: domain.com # domain to join
 
 ## VII. Testing and Troubleshooting
 The templates most likely need a lot of testing to work. This is not covered here; though some hints how to start. You should proceed in this order:
 
-1. __Get your templates to render correctly__. Create random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__. 
+1. __Get your templates to render correctly__. Create random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
 2. __Continue tesing with VMs__ to test netbooting and basic installation
 3. __Debug `peSetup.cmd`__ by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
 4. Use a manual installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
