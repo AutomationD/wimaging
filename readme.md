@@ -1,9 +1,24 @@
 # Provision Windows hosts with [Foreman](http://theforeman.org/)
 
-[![Join the chat at https://gitter.im/helge000/wimaging-ng](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/helge000/wimaging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/helge000/wimaging-ng](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/helge000/wimaging-ng?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-## Abstract
-Wimaging a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts. For these tasks native Windows tools are used; mostly `dism.exe`. Things like `unattend.xml` are rendered by Foreman and downloaded at build time.
+## Introduction
+`wimaging-ng` a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts.
+Most of the time official Microsoft deployment tools are used; mostly `dism.exe`.
+
+All relevant configuration files like `unattend.xml` are rendered by Foreman and downloaded at build time.
+
+### Features
+- __Linux style installation__ using `http://` or `ftp://` installation media
+- __No extra servers__ like WDS needed - all relevant settings can be configured in Foreman directly
+- __Official Mircosoft utilities__ are used for all relevant setup stages making it easy to add (future) operating systems
+- __Driver installation__ during build time
+- Support for __localization__ settings (like time zone, locale, UI language)
+- Optional __domain join__ including target OU
+- Optional __local user creation__
+- Support for Foreman's __root password__ using Base64 encoding
+- Correctly __report finished host building__
+- Optional software installation and user tasks at the end of the build (like __installing puppet__ ect)
 
 ## Prerequisites:
 The list requirements for using Foreman, all of them are __not__ covered by this guide.
