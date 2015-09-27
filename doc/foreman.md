@@ -3,7 +3,7 @@ Now as you have your WIM images ready, it's time to configure your foreman insta
 
 ### Tasks break down
 - Download wimboot
-- Change / add a new OS
+- Change / add a new Architecture and OS
 - Add provision templates
 - Add installation media
 - Add partition table
@@ -15,16 +15,28 @@ Now as you have your WIM images ready, it's time to configure your foreman insta
 Start simple:
 - Add [wimboot](http://git.ipxe.org/releases/wimboot/wimboot-latest.zip) bootloader to `/var/lib/tftpboot/boot/` on your PXE server.
 
-## II. Add a new OS
-Add a new OS in foreman if needed. If you already have windows hosts and puppet, the correct OS will be there already.
+## II. Architecture and OS
+In _Hosts -> Architectures_ add a new architecture:
+
+- Name: `x64`
+
+Add a new OS in _Hosts -> Operating systems_ if needed.
+If you already have windows hosts and puppet, the correct OS and architecture has been auto created already.
 This example covers Windows 8.1 / Windows Server 2012R2.
 
-- Head to _Hosts -> Operating Systems_; New:
+![Add new OS](img/forman_os.png "Adding Windows 8 OS in Foreman")
+
 - Name: `windows`
 - Major: `6`
 - Minor: `3`
 - OS family: `windows`
-- Password encoding: `base64`
+- Description: `Windows8`
+- Root password hash: `Base64`
+- Architectures: `x64`
+
+### Root passwords and encoding
+Take special care to __Root password hash = `Base64`__. The templates do not render correctly if this is set otherwise.
+Also, changing the encoding does not [apply do existing hosts](http://theforeman.org/manuals/1.9/index.html#3.5.2ConfigurationOptions)
 
 ## III. Add provision templates
 Head to _Hosts -> Provisioning Templates -> New_ and create a template for each of the files in `./foreman`.
@@ -68,6 +80,16 @@ __Note:__ This snippet creates extra users in the unattended stage.
 This may be very useful for debugging early stages of your deployment; since you
 can find yourself locked out of the newly provisioned host.
 
+Microsoft did not really care for passwords in unattend.xml files; so it does not really matter if you use
+`<PlainText>true</PlainText>` or not.
+If you want to disguise your password, you could add a host parameter `localUserPassword` and use the following ruby/erb function with `<PlainText>false</PlainText>`:
+
+```ruby
+<%= Base64.encode64(Encoding::Converter.new("UTF-8", "UTF-16LE",:undef => nil).convert(@host.params['localUserPassword']+"Password")).delete!("\n").chomp -%>
+```
+
+Note,  the string`Password` is appended your passwords. You can try this out with by generating an unattend.xml containing local users using WAIK.
+
 #### WAIK extraFinishCommands
 - Name: `WAIK extraFinishCommands`
 - Kind: Snippet
@@ -83,11 +105,15 @@ Eg, `http://winmirror.domain.com/pub/win81x64`. Assign them to your operatingsys
 ## V. Add partition table
 Add the diskpart script from `./foreman/waik_partition_table.erb` as new partition table. Assign it to your windows OS.
 
-## VI. Define provisioning templates
+## VI. Define templates
 Link all the created templates as well as the installation media and partition table to the OS:
 
 - Head to your OS, then provisioning
 - Select the template from each kind from the drop down list
+- In partition tables, select `WAIK default`
+- In installation media, check the appropriate installation media added above.
+
+![Link templates to OS](img/forman_os_templates.png "Linking Windows 8 OS in Foreman")
 
 ## Add Parameters
 To render the the templates correctly, some parameters need to be added. The can be globals, or put them on
@@ -111,7 +137,6 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 - `domainAdminAccountPasswd`: Pa55w@rd - Password for the domain Admin account
 - `computerOU`: OU=Computers,CN=domain,CN=com - Place the computer account in specified Organizational Unit
 - `computerDomain`: domain.com # domain to join
-
 
 ## VII. Testing and Troubleshooting
 The templates most likely need a lot of testing to work. This is not covered here; though some hints how to start.

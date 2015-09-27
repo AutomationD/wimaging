@@ -1,14 +1,13 @@
 <%#
 kind: provision
 name: WAIK default
-# Parameters are expected to be set in Foreman (globally or per group/host)
 params:
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
-- wimImageName: Windows 8.1 Pro # name of the wim image
 - systemLocale: en-US
 - systemUILanguage: en-US
 - systemTimeZone: Pacific Standard Time #see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx
+- wimImageName = Windows 8.1 Pro # Image name seems only necessary if the WIM contains more than one image
 -%>
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -27,8 +26,7 @@ params:
                 <OSImage>
                     <InstallFrom>
                         <MetaData wcm:action="add">
-                            <Key>/IMAGE/NAME</Key>
-                                <Value><%= @host.params['wimImageName'] %></Value>
+                                <Value><%= @host.params['wimImageName'] -%></Value>  
                         </MetaData>
                     </InstallFrom>
                     <InstallToAvailablePartition>true</InstallToAvailablePartition>
@@ -43,19 +41,19 @@ params:
             <SetupUILanguage>
                 <UILanguage>en-US</UILanguage>
             </SetupUILanguage>
-            <% if @host.params['systemLocale'] %>
+            <% if @host.params['systemLocale'] -%>
               <InputLocale><%= @host.params['systemLocale'] %></InputLocale>
               <SystemLocale><%= @host.params['systemLocale'] %></SystemLocale>
               <UILanguageFallback>en-US</UILanguageFallback>
               <UILanguage><%= @host.params['systemUILanguage'] %></UILanguage>
               <UserLocale><%= @host.params['systemLocale'] %></UserLocale>
-            <% else %>
+            <% else -%>
                <InputLocale>en-US</InputLocale>
               <SystemLocale>en-US</SystemLocale>
               <UILanguageFallback>en-US</UILanguageFallback>
               <UILanguage>en-US</UILanguage>
               <UserLocale>en-US</UserLocale>
-            <% end %>
+            <% end -%>
         </component>
     </settings>
     <settings pass="oobeSystem">
@@ -80,6 +78,9 @@ params:
                     <PlainText>false</PlainText>
                     <Value><%= Base64.encode64(Encoding::Converter.new("UTF-8", "UTF-16LE",:undef => nil).convert(Base64.decode64(root_pass)+"AdministratorPassword")).delete!("\n").chomp %></Value>
                 </AdministratorPassword>
+                <% if snippet('WAIK local users') -%>
+                  <%= snippet('WAIK local users') -%>
+                <% end %>
             </UserAccounts>
             <TimeZone><%= @host.params['systemTimeZone'] -%></TimeZone>
             <% if @host.params['windowsLicenseOwner'] -%>
@@ -117,7 +118,7 @@ params:
               <UILanguage>en-US</UILanguage>
               <UILanguageFallback>en-US</UILanguageFallback>
               <UserLocale>en-US</UserLocale>
-            <% end -%>
+            <% end -%>       
         </component>
         <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <IEHardenAdmin>false</IEHardenAdmin>

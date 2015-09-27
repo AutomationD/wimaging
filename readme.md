@@ -56,4 +56,4 @@ Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/thef
 2. Reboot the host; ready for further configuration by Puppet, SCCM ect.
 
 ## License
-See [LICENSE](LICENSE) file.
+See [LICENSE](licenses/LICENSE) file.
