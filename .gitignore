@@ -8,7 +8,7 @@ images/*/save/*
 images/*/vm/*
 images/*/work/*
 
-sources/*/**
+!sources/windows-pe-x64/*
 !install/*template
 
 tools/boot.root/wimaging/utils/*
