@@ -1,8 +1,0 @@
-$wimagingRoot = 'C:\wimaging'
-$deployRoot = Join-Path $wimagingRoot 'deploy'
-$utilsRoot = Join-Path $wimagingRoot 'utils'
-$imageRoot = Join-Path $wimagingRoot 'image'
-$sevenZip = $(Join-Path $utilsRoot '7za.exe')
-
-# Some Sanity Checks
-if (-not (test-path $sevenZip)) {throw "${sevenZip} needed"}

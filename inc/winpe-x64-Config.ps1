@@ -8,7 +8,7 @@
 # TODO: server-2012
 # TODO: server-2012r2
 #############################
-$os = "server-2008r2"
+$os = "windows-pe-x64"
 
 # Edition
 # Available options:
@@ -22,12 +22,10 @@ $os = "server-2008r2"
 # omepremium
 # professional
 # ultimate
-# OS: win81x64
-# professional
 #############################
-$edition = "enterprise"
+$edition = "professional"
 
-# If managing both a boot image and install image ($true or $false)
+# If managing a boot image ($true or $false)
 $boot = $true
 
 # Directory that will be used to mount wim files for processing. Default is $mount_dir = $script_path +"\" + $os + "\mount"
@@ -35,24 +33,24 @@ $boot = $true
 
 # Directory that will be used to output captured wims (and further processing). Uses images\$os\captured by default
 #$captured_wims_dir = ""
-
-# Directory where windows distributions reside. Must be a directory that is served from a network share.
+ 
+# Directory where windows distributions reside. Must be a directory that is served from a network share. 
 #$install_root = ""
 
 # Path to drivers directory, default .\install\drivers
-#$drivers_dir = "${script_path}\install\${os}\drivers"
+#$drivers_dir = ""
 
 # DISM Location, default 'dism.exe'
 #$dism = ""
 
 # Imagex Location
-#$imagex = ""
+$imagex = "C:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit\Deployment Tools\amd64\DISM\imagex.exe"
 
 # Windows ADK (default:c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit)
-#$windows_adk_path=""
+$windows_adk_path="C:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
 
 # WSUS Offline location. Must point to root that contains subfolders for distributions
-$wsus_offline_dir = "e:\wsus_offline"
+$wsus_offline_dir = "C:\deploy\wsusoffline\client"
 
 # Sytem Reserved Partition Mount Letter. Used when mounting VHD
 $system_reserved_mount="R"

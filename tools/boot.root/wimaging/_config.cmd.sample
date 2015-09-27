@@ -1,6 +1,8 @@
-set deploymentShare=<deployment_share_ip>
-set foremanHost=<foreman_host_ip>
+:: reanme this file to "_config.cmd"
+:: change this
+set foremanHost=<foreman_hostiname_or_ip>
 
+:: keep
 set wimagingRoot=x:\wimaging
 set deployRoot=%wimagingRoot%\deploy
 set utilsRoot=%wimagingRoot%\utils

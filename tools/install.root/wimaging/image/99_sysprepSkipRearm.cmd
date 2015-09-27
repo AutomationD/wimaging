@@ -1,1 +1,0 @@
-%WINDIR%\System32\sysprep\sysprep.exe /oobe /generalize /shutdown /unattend:skiprearm_unattend.xml

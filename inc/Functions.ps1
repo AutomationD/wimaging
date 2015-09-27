@@ -164,19 +164,19 @@ function InstallPackages([string]$updates_dir) {
 
 function SafeUnmountWim ([string]$mount_dir) {
 	# Commit only on successful update
-	if ($lastexitcode -ne 0)
-	{
-		Write-Host "Errors found, NOT committing any changes"
-		UnmountWim $mount_dir "n"
-		Write-Error "Wim was as not pushed"
-	}
-	else
-	{
+	#if ($lastexitcode -ne 0)
+	#{
+	#	Write-Host "Errors found, NOT committing any changes"
+	#	UnmountWim $mount_dir "n"
+	#	Write-Error "Wim was as not pushed"
+	#}
+	#else
+	#{
 		Write-Host "No errors found, committing changes"
 		UnmountWim $mount_dir
 		#PushWim $wim_file
 		
-	}
+	#}
 }
 
 function Copy-File([string]$src, [string]$dst) {
