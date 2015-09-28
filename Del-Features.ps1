@@ -5,7 +5,7 @@
  
 # Main Program
 MountWim $wim_file $mount_dir $wim_image_name
-AddFeatures $mount_dir $add_features
+DelFeatures $mount_dir $del_features
 
 # Commit only on successful update
 if ($lastexitcode -ne 0)
