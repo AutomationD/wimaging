@@ -18,6 +18,7 @@
 - ```Add-Updates.ps1```: Adds updates to current work WIM.
 - ```Capture-Wim.ps1```: Captures WIM from a mounted VHD.
 - ```Add-Features.ps1```: Adds features to current work WIM.
+- ```Del-Features.ps1```: Removes features from current work WIM.
 - ```Add-Tools.ps1```: Adds tools to current work WIM.
 - ```Add-ToolsVHD.ps1```: Adds tools to VHD.
 - ```Add-Drivers.ps1```: Adds drivers to current work WIM.

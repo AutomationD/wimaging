@@ -42,6 +42,9 @@ $edition = "enterprise"
 # Path to drivers directory, default .\install\drivers
 $drivers_dir = "${script_path}\install\${os}\drivers"
 
+# Path to language packs directory, default .\install\langpacks
+#$langpacks_dir = ""
+
 # DISM Location, default 'dism.exe'
 #$dism = ""
 
@@ -53,6 +56,12 @@ $drivers_dir = "${script_path}\install\${os}\drivers"
 
 # WSUS Offline location. Must point to root that contains subfolders for distributions
 $wsus_offline_dir = "${script_path}\..\wsus_offline"
+
+# Add/enable specific features in the image (array). Use Get-DismFeatures.ps1 to discover available features
+$add_features = "NetFx3"
+
+# Del/disable specific features in the image (array)
+#$del_features = ""
 
 # Sytem Reserved Partition Mount Letter. Used when mounting VHD
 $system_reserved_mount="R"
