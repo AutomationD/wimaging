@@ -484,7 +484,7 @@ This partition table will create Windows Server 2008 R2 and higher compatible pa
     - __Description__: _Windows Server 2012 R2_
     - __OS Family__: _Windows_
     - __Root PW Hash__: _MD5_
-    - __Architechtures__: _x64_
+    - __Architectures__: _x64_
 
 - __Partition Table__
     - _Windows 2012 R2 - C:\ Entire Disk_ (defined [here](partition-table))
