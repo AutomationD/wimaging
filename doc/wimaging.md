@@ -38,7 +38,8 @@ For each OS, you'll need a Config.ps1. Since most of the variables do not change
 
 - __$os__: Very important to use provided options, as the directory structure uses that pattern.
 - __$edition__: _standard_ / _enterprise_ / _datacenter_ / _Windows 8.1 Pro_. This seems only to be of importance if the WIM contains more than one image. If unsure; run `./Get-Wiminfo.ps1` later on
-- __$wsus_offline_dir__: directory where locally downloaded windows updates reside (for ex.: ```$wsus_offline_dir = "c:/wsusoffline/client"```)
+- __$wsus_offline_dir__: directory where locally downloaded windows updates reside (for ex.: `$wsus_offline_dir = "..\wsusoffline\client"`)
+- __$drivers_dir__`: Location of driver files to inject to wim. Only relevant for Windows PE since host drivers are installed at build time.
 
 There are a lot of commented out options; you can ignore these.
 
@@ -56,7 +57,7 @@ Edit the line `foremanHost=<foreman_hostiname_or_ip>` to point to a resolvable l
 Since this is used to test networking the WinPE stage, any pingable IP will do here; though your foreman installation makes most sense.
 
 ### Adding extras, drivers and boot files
-1. Create a copy of `./install/directory.template` in `./install/`. Name it after the OS name found in `Config.ps1`.
+1. Create a copy of `./sources/directory.template` in `./sources/`. Name it after the OS name found in `Config.ps1`.
 2. Repeat for each os
 2. The template for Windows PE is already prepared; but still check whatever it need changes
 5. Copy boot files from `./sources/<os>/boot/*` do `boot/`. These will later be download by foreman-proxy.
@@ -67,9 +68,10 @@ Start `./run-wimaging-shell.cmd`. From the menu, select the configuration for th
 To show the menu again, run `./Show-Menu.ps1`. Go through all your operating systems.
 
 ### Creating `install.wim`
-1. Run `./Init-WorkWim.ps1`. This will copy required files from your `./sources` directory.
+1. Run `./Init-WorkWim.ps1`. This will copy required files from your `./sources` directory
+2. Run `./Init-InstallSources.ps1`. Copy over source files to `./install`
 2. Run `./Update-All.ps1`. This step injects updates to the image
-3. Run `./Push-Wim.ps1` to copy the prepared WIM files to the install path.
+3. Run `./Push-Wim.ps1` to copy the prepared WIM files to the install path
 
 ### Adding drivers and extras
 - Copy drivers and extras to the respective folders in `./install/<osname>`. The folder structure below `drivers/` does not matter, all drivers present will be added recursively.
@@ -78,7 +80,7 @@ To show the menu again, run `./Show-Menu.ps1`. Go through all your operating sys
 ### Creating `boot.wim`
 One winpe image will serve as boot file for your all operating systems.
 Since this file is transferred by TFTP to your hosts later we should keep it small.
-Gather all essential drivers (most likely for network and storage adapters) in `./sources/windows-pe-x64/drivers` or set another path in the configuration.
+Gather all essential drivers (most likely for network and storage adapters) in `.\sources\windows-pe-x64\drivers` or set another path in the configuration.  Some vendors supply PE driver packs.
 
 1. Run `./Show-Menu.ps1` and select `winpe-x64-Config.ps1`
 1. Run `./Init-WorkWim.ps1`. This will copy required files from your `./sources` directory.
