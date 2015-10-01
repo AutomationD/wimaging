@@ -1,0 +1,5 @@
+# normalize line endings:
+* text=lf
+*.erb text=lf
+
+*.exe binary
