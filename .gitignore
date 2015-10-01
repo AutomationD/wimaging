@@ -25,3 +25,5 @@ tests/*
 
 !.gitignore
 !**/*.sample*
+
+.idea/
