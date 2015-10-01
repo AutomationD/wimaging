@@ -17,7 +17,6 @@ All relevant configuration files like `unattend.xml` are rendered by Foreman and
 - Optional __domain join__ including target OU
 - Optional __local user creation__
 - Support for Foreman's __root password__ using Base64 encoding
-- Correctly __report finished host building__
 - Optional software installation and user tasks at the end of the build (like __installing puppet__ ect)
 
 ## Prerequisites:
@@ -37,7 +36,7 @@ The tasks can be broken down in two steps:
 #### 1. [Configure wimaging and create WIM images](doc/wimaging.md)
 #### 2. [Configuring Foreman](doc/foreman.md)
 
-#### [Script Reference](doc/reference.md)
+#### A. [Script Reference](doc/reference.md)
 
 ## Provision work flow
 An outline of the process to better understand the tasks witch need to be done. Basically, there are three phases:
