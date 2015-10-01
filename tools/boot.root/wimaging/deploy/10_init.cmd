@@ -11,7 +11,7 @@ ipconfig /renew
 ping -n 1 %foremanHost% > NUL
 if %errorlevel% == 0 goto pingok
 REM wait 3 sec. and try it again
-timeout /NOBREAK /t 3
+ping -n 3 127.0.0.1>NUL
 goto testagain
 :pingok
 for /f "delims=[] tokens=2" %%a in ('ping -4 %foremanHost% -n 1 ^| findstr "["') do (set thisip=%%a)
