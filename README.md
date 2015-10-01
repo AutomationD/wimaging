@@ -4,7 +4,7 @@
 
 ## Introduction
 `wimaging-ng` a set of scripts to prepare [WIM images](https://en.wikipedia.org/wiki/Windows_Imaging_Format) and templates for Foreman to provision Windows hosts.
-Most of the time official Microsoft deployment tools are used; mostly `dism.exe`.
+Except for the boot process official Microsoft deployment tools are used; most notably `dism.exe`.
 
 All relevant configuration files like `unattend.xml` are rendered by Foreman and downloaded at build time.
 
