@@ -19,8 +19,8 @@ All relevant configuration files like `unattend.xml` are rendered by Foreman and
 - Support for Foreman's __root password__ using Base64 encoding
 - Optional software installation and user tasks at the end of the build (like __installing puppet__ ect)
 
-## Prerequisites:
-The list requirements for using Foreman, all of them are __not__ covered by this guide.
+## Prerequisites
+Requirements for using wimaging-ng, they are __not__ covered in this guide.
 
 - A working Foreman __version 1.8+__ installation (obviously), capable of net booting clients along with a working DNS / DHCP infrastructure
 - Currently, [Safe Mode Render](http://theforeman.org/manuals/1.9/index.html#3.5.2ConfigurationOptions) must be disabled in foreman
@@ -35,7 +35,7 @@ The tasks can be broken down in two steps:
 
 #### 1. [Configure wimaging and create WIM images](doc/wimaging.md)
 #### 2. [Configuring Foreman](doc/foreman.md)
-
+---
 #### A. [Script Reference](doc/reference.md)
 
 ## Provision work flow
