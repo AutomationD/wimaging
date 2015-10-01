@@ -9,7 +9,7 @@ images/*/vm/*
 images/*/work/*
 
 !sources/windows-pe-x64/*
-!install/*template
+!sources/*template
 
 tools/boot.root/wimaging/utils/*
 tools/*/wimaging/log/*
