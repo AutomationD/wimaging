@@ -150,6 +150,7 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 - `computerDomain`: domain.com # domain to join
 
 ## VII. Testing and Troubleshooting
+### Templates
 The templates most likely need a lot of testing to work. This is not covered here; though some hints how to start. You should proceed in this order:
 
 1. __Get your templates to render correctly__. Create random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
@@ -157,3 +158,14 @@ The templates most likely need a lot of testing to work. This is not covered her
 3. __Debug `peSetup.cmd`__ by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
 4. Use a manual installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
 4. __Examine `C:\foreman.log.`__ - the output left from the finish script. Also, comment out the clean up stage in the finish script to examine and test the rendered scripts directly.
+
+### Netbooting
+Sometimes wimboot seems not to be able to boot our winPE.wim. Symptoms range from black screens to kernel panics (aka _blue screen_). These problems seem to be more likely on older hardware.
+
+In this case a workaround can be to simply use any other bootable media like USB thumb drives and CD-ROMs. The process is relatively simple:
+
+1. Use a common tool [Media Creator](http://windows.microsoft.com/en-us/windows-8/create-reset-refresh-media) to create a bootable media like a USB stick or ISO image. Since we do not use the image downloaded by the tool, the only imported choice is `architecture`.
+2. In the image or the USB drive, replace `sources/boot.wim` with the version created by `wimaging-ng`
+3. Boot from the media
+
+
