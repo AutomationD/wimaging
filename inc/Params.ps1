@@ -130,6 +130,15 @@ if ($boot -ne $true) {
 			$wim_index = 2
 			$wim_image_name = "Windows Server 2012 R2 SERVERSTANDARD"
 		}
+	} elseif ($os -eq "win81x64") {
+        # Directory where the updates are located
+		$updates_dir = $wsus_offline_dir+"\w63-x64\glb"
+		if ($edition -eq "professional") {
+			# Index of the actual image in the original install.wim
+            $wim_index = 1
+            # Image name in the original install.wim
+			$wim_image_name = "Windows 8.1 Pro"	
+		}
 	} elseif ($os -eq "win7x64") {
 		# Directory where the updates are located
 		$updates_dir = $wsus_offline_dir+"\w61-x64\glb"

@@ -1,0 +1,71 @@
+<%#
+kind: script
+name: WAIK peSetup.cmd
+# Parameters are expected to be set in Foreman (globally or per group/host)
+params:
+- wimImageName: Windows 8.1 Pro # name of wim image to apply
+- windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
+- windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
+-%>
+@echo off
+set WGET=x:\wimaging\deploy\wget64.exe
+
+<%= @host.diskLayout %>
+
+%WGET% <%= @host.os.medium_uri(@host).to_s %>/sources/install.wim -O C:\install.wim
+
+echo Write the install image to the partition
+dism.exe /apply-image /imagefile:C:\install.wim /name:"<%= @host.params['wimImageName'] %>" /ApplyDir:C:\
+
+echo removing install.wim
+del /q /s C:\install.wim
+ 
+::Set the proper boot sector
+bootsect.exe /nt60 C:
+C:\Windows\System32\bcdboot C:\Windows /l en-US
+ 
+echo Downloading the drivers 
+md c:\drivers
+%WGET% -P c:\drivers -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= @host.os.medium_uri(@host).to_s %>/drivers/
+
+<% if snippets "WAIK extraFinishCommands" -%>
+  echo Downloading extras
+  md C:\Extras
+  %WGET% -P c:\Extras -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= @host.os.medium_uri(@host).to_s %>/extras/
+<% end -%>
+ 
+echo Stage the Unattend.xml file for dism to apply
+set myDIR=c:\Windows\Panther\
+IF not exist %myDIR% (mkdir %myDIR%)
+
+echo Downloading unattend.xml
+%WGET% --no-verbose <%= foreman_url("provision") -%> -O c:\Windows\Panther\unattend.xml
+
+echo Downloading finsh script and activating SetupComplete.cmd
+md c:\deploy
+%WGET% --no-verbose <%= foreman_url("finish") -%> -O C:\deploy\foreman-finish.bat
+
+echo copy tools
+copy x:\wimaging\deploy\wget64.exe C:\deploy\
+copy x:\wimaging\deploy\wget64.exe C:\Windows\wget.exe
+copy x:\wimaging\deploy\sdelete.exe C:\Windows\
+IF not exist C:\Windows\Setup\Scripts (md C:\Windows\Setup\Scripts)
+echo call C:\deploy\foreman-finish.bat ^> c:\foreman.log 2^>^&1 > C:\Windows\Setup\Scripts\SetupComplete.cmd
+
+<% if foreman_url('user_data') %>
+  echo Downlodiang user data
+  %WGET% <%= foreman_url('user_data') %> -O c:\deploy\joinDomain.ps1
+<% end -%>
+  
+echo Creating a temp staging folder for DISM
+md c:\MININT\Scratch
+
+echo Apply Unattend.xml
+dism.exe /Image:C:\ /Apply-Unattend:c:\Windows\Panther\unattend.xml /ScratchDir:C:\MININT\Scratch/
+
+echo Apply Drivers
+dism.exe /Image:C:\ /Add-Driver /Driver:c:\drivers\ /Recurse /ForceUnsigned
+
+:: Uncomment PAUSE for debug:
+::PAUSE
+exit 0

@@ -1,0 +1,26 @@
+# Commands Information
+- ```Init-InstallSources.ps1```: Copies ISO files to wimaging.
+- ```Init-WorkWim.ps1```: Initializes work .wim file from sources
+- ```Update-All.ps1```: Triggers full-cycle .wim process.
+- ```Backup-WorkWim.ps1```: Backs up current .wim (in case you don't want to loose your changes).
+- ```Push-WimBoot.ps1```: Pushes current work boot.wim to install dirrectory, which makes it available over network.
+- ```Unmount-VHD.ps1```: Unmounts VHD
+- ```Update-BootAll.ps1```
+- ```Push-Wim.ps1```: Pushes current work .wim to install dirrectory, which makes it available over network.
+- ```Revert-WorkWim.ps1```: Removes current work wim and copies one from install location.
+- ```Save-InstallWim.ps1```: Saves install.wim in case you want to keep a good one.
+- ```MountUnmount-VHD.ps1```: Mounts VHD -> Waits for user keystroke -> Unmounts VHD (Useful for debugging)
+- ```MountUnmount-Wim.ps1```: Mounts WIM -> Waits for user keystroke -> Unmounts WIM (Useful for debugging)
+- ```Prepare-Image.ps1```:
+- ```Get-WimInfo.ps1```: Query information about WIM (Images, etc)
+- ```Init-PxeTools.ps1```:
+- ```Init-Updates.ps1```:
+- ```Add-Updates.ps1```: Adds updates to current work WIM.
+- ```Capture-Wim.ps1```: Captures WIM from a mounted VHD.
+- ```Add-Features.ps1```: Adds features to current work WIM.
+- ```Del-Features.ps1```: Removes features from current work WIM.
+- ```Add-Tools.ps1```: Adds tools to current work WIM.
+- ```Add-ToolsVHD.ps1```: Adds tools to VHD.
+- ```Add-Drivers.ps1```: Adds drivers to current work WIM.
+- ```Unmount-Wim.ps1```: Unmount currently mounted WIM.
+- ```Get-DismFeatures.ps1```

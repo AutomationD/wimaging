@@ -383,9 +383,22 @@ function AddTools([string]$tools_dir, [string]$mount_dir) {
 	}
 }
 
-function PushWim([string]$wim_file) {		
-	Write-Host "Pushing $wim_file to $wim_file_install" -foregroundcolor "green"
-	Copy-Item $wim_file $wim_file_install -Force -Recurse
+function PushWim([string]$wim_file) {
+  if ($os -Like "*-pe*") {
+    $osdirs = Get-Item -Path "${script_path}\install\*" -Exclude "*-pe-*","*.template","*.md"
+    Write-Host "Pushing $wim_file to to all install dirs" -foregroundcolor "yellow"
+    foreach ($install_path in $osdirs) {
+      if (Test-Path -PathType Container $install_path) {
+        $install_boot_wim = "${install_path}\sources\boot.wim"
+        Write-Host "Pushing $wim_file to ${install_boot_wim}" -foregroundcolor "green"
+        Copy-Item $wim_file $install_boot_wim -Force -Recurse
+      }
+    }
+  }
+  else {
+    Write-Host "Pushing $wim_file to $wim_file_install" -foregroundcolor "green"
+    Copy-Item $wim_file $wim_file_install -Force -Recurse
+  }
 }
 
 function GetCapturedWim([string]$captured_wim,[string]$wim_file) {
