@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/kireevco/wimaging](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kireevco/wimaging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
-`wimaging-ng` a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts.
+`wimaging` a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts.
 Most of the time official Microsoft deployment tools are used; mostly `dism.exe`.
 
 All relevant configuration files like `unattend.xml` are rendered by Foreman and downloaded at build time.
@@ -71,14 +71,14 @@ Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/thef
 2. Reboot the host; ready for further configuration by Puppet, SCCM ect.
 
 ## Acknowledgments
-`wimaging-ng` is a fork of [wimaging](https://github.com/kireevco/wimaging). Many thanks to [Dmitry Kireev](https://github.com/kireevco), the original author.
+`wimaging` has a merged a fork of [wimaging-ng](https://github.com/helge000/wimaging-ng). Many thanks to [Daniel Helgenberger](https://github.com/helge000) for a large contribution portion.
 SDelete and other PStools by SysInternals are the work of [Mark Russinovich](http://blogs.technet.com/b/markrussinovich/about.aspx).
 
 ## License
-[wimaging-ng license](licenses/wimaging-ng.license)
+[wimaging license](licenses/wimaging.license)
 
 Other licenses:
 
-- [Original wimaging Dmitry Kireev](licenses/wimaging.license)
+- [wimaging-ng Daniel Helgenberger](licenses/wimaging-ng.license)
 - [SysInternals](licenses/sysinternals.license)
 - [Gnu General Public License v3 for GNU wget and other utilities](licenses/gpl-v3.license)
