@@ -1,0 +1,3 @@
+[submodule "foreman"]
+	path = foreman
+	url = https://github.com/kireevco/foreman-wimaging.git
