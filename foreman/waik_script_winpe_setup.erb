@@ -1,12 +1,15 @@
 <%#
 kind: script
 name: WAIK peSetup.cmd
-# Parameters are expected to be set in Foreman (globally or per group/host)
-params:
+oses:
+- Windows
+%>
+<%#
+Parameters are expected to be set in Foreman (globally or per group/host)
 - wimImageName: Windows 8.1 Pro # name of wim image to apply
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
--%>
+%>
 @echo off
 set WGET=x:\wimaging\deploy\wget64.exe
 

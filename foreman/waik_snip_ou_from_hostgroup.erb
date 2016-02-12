@@ -2,9 +2,13 @@
 Generate the OU from the hosts' hostgroup and domain
 Name: WAIK OU from Hostgroup
 Type: Snippet
-params:
-- computerOuSuffix: CN=company computers # exta ou appended to the generated ou
--%>
+oses:
+- Windows
+%>
+<%#
+Parameters are expected to be set in Foreman (globally or per group/host)
+- computerOuSuffix: CN=company computers # extra ou appended to the generated ou
+%>
 <%
 ou_prefix = 'OU='
 dc_prefix = 'DC='

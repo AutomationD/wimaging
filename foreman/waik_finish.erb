@@ -1,8 +1,11 @@
 <%#
 kind: finish
 name: WAIK default
-# Parameters are expected to be set in Foreman (globally or per group/host)
-params:
+oses:
+- Windows
+%>
+<%#
+Parameters are expected to be set in Foreman (globally or per group/host)
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
 - localAdminiAccountDisabled: false
@@ -11,7 +14,7 @@ params:
 - domainAdminAccountPasswd: Password for the domain Admin account
 - computerOU: OU=Computers,CN=domain,CN=com # Place the computer account in specified Organizational Unit
 - computerDomain: domain.com # domain to join
--%>
+%>
 @echo off
 <% unless @host.params['localAdminiAccountDisabled'] -%>
   echo Activating administrator

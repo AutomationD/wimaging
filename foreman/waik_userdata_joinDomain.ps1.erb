@@ -1,12 +1,16 @@
 <%#
 kind: user_data
 name: WAIK joinDomain.ps1
-params:
+oses:
+- Windows
+%>
+<%#
+Parameters are expected to be set in Foreman (globally or per group/host)
 - domainAdminAccount: administrator@domain.com # use tthis account to join domain. If set, domain join will run
 - domainAdminAccountPasswd: Password for the domain Admin account
 - computerOU: OU=Computers,CN=domain,CN=com # Place the computer account in specified Organizational Unit
 - computerDomain: domain.com # domain to join, optional
--%>
+%>
 $user = "<%= @host.params['domainAdminAccount'] -%>"
 $passwd = ConvertTo-SecureString -String "<%= @host.params['domainAdminAccountPasswd'] -%>" -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $passwd

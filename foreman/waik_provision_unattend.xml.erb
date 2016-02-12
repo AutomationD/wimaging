@@ -1,6 +1,11 @@
 <%#
 kind: provision
 name: WAIK default
+oses:
+- Windows
+%>
+<%#
+Parameters are expected to be set in Foreman (globally or per group/host)
 params:
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
@@ -8,7 +13,7 @@ params:
 - systemUILanguage: en-US
 - systemTimeZone: Pacific Standard Time #see https://msdn.microsoft.com/en-us/library/ms912391(v=winembedded.11).aspx
 - wimImageName = Windows 8.1 Pro # Image name seems only necessary if the WIM contains more than one image
--%>
+%>
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
     <servicing></servicing>
