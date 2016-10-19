@@ -12,7 +12,7 @@ if ($arch -eq $null) {
 	$arch = "amd64"
 }
 
-$mount_disk = $c_drive_mount	
+$mount_disk = $c_drive_mount
 
 if ($boot) {
 	$wim_type = 'boot'
@@ -25,7 +25,7 @@ if ($windows_adk_path -eq $null) {
 		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
 	} else {
 		$windows_adk_path="c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit"
-	}	
+	}
 }
 
 # Mount Directory
@@ -50,7 +50,7 @@ if ($dism -eq $null) {
 		$dism = "${windows_adk_path}\Deployment Tools\${arch}\DISM\dism.exe"
 	} else {
 		$dism = 'dism.exe'
-	}	
+	}
 }
 
 if ($imagex -eq $null) {
@@ -58,13 +58,13 @@ if ($imagex -eq $null) {
 		$imagex = "${windows_adk_path}\Deployment Tools\${arch}\DISM\imagex.exe"
 	} else {
 		$imagex = 'imagex.exe'
-	}	
+	}
 }
 
 if ($sources_root -ne $nul) {
 	$sources = "${sources_root}\${os}"
 } else {
-	$sources = "${script_path}\sources\${os}"		
+	$sources = "${script_path}\sources\${os}"
 }
 
 $pe_features_root="${sources}\WinPE_FPs"
@@ -73,36 +73,36 @@ $pe_features_root="${sources}\WinPE_FPs"
 $save_dir = "${script_path}\images\${os}\save"
 
 
-		
+
 # Checking if we are working on boot.wim or install.wim
 
 
 if ($boot -ne $true) {
 	# install.wim
-	
+
 	$tools_dir = "${script_path}\tools\install.root"
-	
+
 	# Wim file that scripts process (AddTools, AddFeature, etc)
 	$wim_file = "${script_path}\images\${os}\work\install.wim"
 	# Location of install.wim within windows installation "dvd" root. That's the file that the installer takes. Supposed to be exposed via a network share
 	if ($install_root -ne $nul) {
 		$wim_file_install = "${install_root}\${os}\sources\install.wim"
 		$install = "${install_root}\${os}"
-	} else {	
+	} else {
 		$wim_file_install = "${script_path}\install\${os}\sources\install.wim"
 		$install = "${script_path}\install\${os}"
 	}
-	
+
 	$sources_wim_file = "${sources}\sources\install.wim"
-	
+
 	# Filename for captured (from vhd) wim file
 	if ($captured_wims_dir -ne $null) {
 		$captured_wim = "${captured_wims_dir}\${os}.${edition}.install.$(Get-Date -format yyyMMdd).wim"
 	} else {
 		$captured_wim = "${script_path}\images\${os}\captured\${os}.${edition}.install.$(Get-Date -format yyyMMdd).wim"
 	}
-	
-	
+
+
 
 	if ($os -eq "server-2008r2") {
         # Directory where the updates are located
@@ -110,22 +110,22 @@ if ($boot -ne $true) {
 		if ($edition -eq "enterprise") {
 			# Index of the actual image in the original install.wim
             $wim_index = 3
-            
+
             # Image name in the original install.wim
-			$wim_image_name = "Windows Server 2008 R2 SERVERENTERPRISE"				
+			$wim_image_name = "Windows Server 2008 R2 SERVERENTERPRISE"
 		} elseif ($edition -eq "standard") {
 			$wim_index = 1
 			$wim_image_name = "Windows Server 2008 R2 SERVERSTANDARD"
-		}		
+		}
 	} elseif ($os -eq "server-2012r2") {
         # Directory where the updates are located
 		$updates_dir = $wsus_offline_dir+"\w63-x64\glb"
 		if ($edition -eq "datacenter") {
 			# Index of the actual image in the original install.wim
             $wim_index = 4
-            
+
             # Image name in the original install.wim
-			$wim_image_name = "Windows Server 2012 R2 SERVERDATACENTER"	
+			$wim_image_name = "Windows Server 2012 R2 SERVERDATACENTER"
 		} elseif ($edition -eq "standard") {
 			$wim_index = 2
 			$wim_image_name = "Windows Server 2012 R2 SERVERSTANDARD"
@@ -137,7 +137,19 @@ if ($boot -ne $true) {
 			# Index of the actual image in the original install.wim
             $wim_index = 1
             # Image name in the original install.wim
-			$wim_image_name = "Windows 8.1 Pro"	
+			$wim_image_name = "Windows 8.1 Pro"
+		}
+	} elseif ($os -eq "win10x64") {
+      # Directory where the updates are located
+	$updates_dir = $wsus_offline_dir+"\w100-x64\glb"
+	if ($edition -eq "professional") {
+		# Index of the actual image in the original install.wim
+          $wim_index = 1
+          # Image name in the original install.wim
+		$wim_image_name = "Windows 10 Pro"
+		} elseif ($edition -eq "home") {
+			$wim_index = 2
+			$wim_image_name = "Windows 10 Home"
 		}
 	} elseif ($os -eq "win7x64") {
 		# Directory where the updates are located
@@ -157,7 +169,7 @@ if ($boot -ne $true) {
 			$wim_image_name = "Windows 7 ULTIMATE"
 		}
 	} elseif ($os -like "*-pe-*") {
-		$updates_dir = $pe_features_root			
+		$updates_dir = $pe_features_root
 	}
 
 
@@ -165,26 +177,26 @@ if ($boot -ne $true) {
 	# boot.wim file
 
 	$tools_dir = "${script_path}\tools\boot.root"
-	# Location of install.wim within windows installation "dvd" root. That's the file that the installer takes. 
+	# Location of install.wim within windows installation "dvd" root. That's the file that the installer takes.
 	# Supposed to be exposed via a network share and http
 	if ($install_root -ne $nul) {
 		$wim_file_install = "${install_root}\${os}\sources\boot.wim"
 		$install = "${install_root}\${os}"
-	} else {	
+	} else {
 		$wim_file_install = "${script_path}\install\${os}\sources\boot.wim"
 		$install = "${script_path}\install\${os}"
 	}
-	
+
 	if ($os -like "*-pe*") {
 		$sources_wim_file = "${sources}\winpe.wim"
 	} else {
 		$sources_wim_file = "${sources}\sources\boot.wim"
 	}
-	
-	
+
+
 	# Wim file that scripts processes (AddTools, AddFeature, etc)
 	$wim_file = "${script_path}\images\${os}\work\boot.wim"
-	
+
 	# Filename for captured (from vhd) wim file
 	if ($captured_wims_dir -ne $null) {
 		$captured_wim = "${captured_wims_dir}\${os}.${edition}.boot.$(Get-Date -format yyyMMdd).wim"
@@ -193,26 +205,26 @@ if ($boot -ne $true) {
 	}
 	if ($os -eq "server-2008r2") {
 		$wim_image_name_pe = "Microsoft Windows PE (x64)"
-		
-		
+
+
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
 
 	} elseif ($os -eq "server-2012r2" -or $os -eq "win7x64") {
 		$wim_image_name_pe = "Microsoft Windows PE (x64)"
-		
-		
+
+
 		$wim_image_name_setup = "Microsoft Windows Setup (x64)"
 		$wim_image_name = $wim_image_name_setup
-				
+
 	} elseif ($os -eq "windows-pe-x86")	{
-		
+
         # Wim file that scripts process (AddTools, AddFeature, etc)
 		$wim_file = $script_path + "\images\" + $os + "\work\boot.wim"
 		$wim_image_name = "Microsoft Windows PE (x86)"
-				
-	} elseif ($os -eq "windows-pe-x64")	{	
-		$wim_image_name = "Microsoft Windows PE (x64)"				
+
+	} elseif ($os -eq "windows-pe-x64")	{
+		$wim_image_name = "Microsoft Windows PE (x64)"
 	}
 }
 
@@ -223,5 +235,3 @@ if (-not(Test-Path -PathType Container $save_dir)) {
 if (-not(Test-Path -PathType Container $install)) {
 	New-Item -ItemType Directory -Path $install
 }
-
-
