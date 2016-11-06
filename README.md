@@ -3,7 +3,7 @@
 [![Join the chat at https://gitter.im/kireevco/wimaging](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kireevco/wimaging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
-`wimaging` a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts.
+`wimaging` is a set of scripts to prepare WIM images and templates for Foreman to provision Windows hosts.
 Most of the time official Microsoft deployment tools are used; mostly `dism.exe`.
 
 All relevant configuration files like `unattend.xml` are rendered by Foreman and downloaded at build time.
@@ -11,14 +11,14 @@ All relevant configuration files like `unattend.xml` are rendered by Foreman and
 ### Features
 - __Linux style installation__ using `http://` or `ftp://` installation media
 - __No extra servers__ like WDS needed - all relevant settings can be configured in Foreman directly
-- __Official Mircosoft utilities__ are used for all relevant setup stages making it easy to add (future) operating systems
+- __Official Microsoft utilities__ are used for all relevant setup stages making it easy to add (future) operating systems
 - __Driver installation__ during build time
 - Support for __localization__ settings (like time zone, locale, UI language)
 - Optional __domain join__ including target OU
 - Optional __local user creation__
 - Support for Foreman's __root password__ using Base64 encoding
 - Correctly __report finished host building__
-- Optional software installation and user tasks at the end of the build (like __installing puppet__ ect)
+- Optional software installation and user tasks at the end of the build (like __installing puppet__ etc)
 
 ## Prerequisites:
 The list requirements for using Foreman, all of them are __not__ covered by this guide.
@@ -53,7 +53,7 @@ Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/thef
   1. Drive 0 is cleaned, partitioned and mounted using foreman partition table (simple `diskpart` script)
   4. `install.wim` is downloaded via http/ftp and applied using `dism.exe`
   5. `unattend.xml` (`foreman_url('provision')`) is download and applied using `dism.exe`
-  6. Drivers are download and added using `dism.exe`
+  6. Drivers are downloaded and added using `dism.exe`
   6. Required tools are added to the new host (most prominently `wget`)
   6. Optionally, download extra software (like puppet)
   6. Optionally, domain join script (`foreman_url('user_data')`)

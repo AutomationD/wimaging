@@ -21,7 +21,7 @@ In _Hosts -> Architectures_ add a new architecture:
 - Name: `x64`
 
 Add a new OS in _Hosts -> Operating systems_ if needed.
-If you already have windows hosts and puppet, the correct OS and architecture has been auto created already.
+If you already have windows hosts and puppet, the correct OS and architecture have been auto created already.
 This example covers Windows 8.1 / Windows Server 2012R2.
 
 ![Add new OS](img/forman_os.png "Adding Windows 8 OS in Foreman")
@@ -88,7 +88,7 @@ If you want to disguise your password, you could add a host parameter `localUser
 <%= Base64.encode64(Encoding::Converter.new("UTF-8", "UTF-16LE",:undef => nil).convert(@host.params['localUserPassword']+"Password")).delete!("\n").chomp -%>
 ```
 
-Note,  the string`Password` is appended your passwords. You can try this out with by generating an unattend.xml containing local users using WAIK.
+Note,  the string `Password` is appended your passwords. You can try this out with by generating an unattend.xml containing local users using WAIK.
 
 #### WAIK extraFinishCommands
 - Name: `WAIK extraFinishCommands`
@@ -133,7 +133,7 @@ required and have defaults. For the most up to date desciption see the template 
 ### Important parameters
 #### Required
 - `windowsLicenseKey`: Valid Windows license key or generic KMS key
-- `windowsLicenseOwner`:Legal owner of the Windows license key
+- `windowsLicenseOwner`: Legal owner of the Windows license key
 - `wimImageName`: WIM image to install from a multi image install.wim file.
 
 #### Optional
@@ -152,8 +152,8 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 ## VII. Testing and Troubleshooting
 The templates most likely need a lot of testing to work. This is not covered here; though some hints how to start. You should proceed in this order:
 
-1. __Get your templates to render correctly__. Create random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
-2. __Continue tesing with VMs__ to test netbooting and basic installation
+1. __Get your templates to render correctly__. Create a random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
+2. __Continue testing with VMs__ to test netbooting and basic installation
 3. __Debug `peSetup.cmd`__ by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
-4. Use a manual installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
+4. Use a manually installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
 4. __Examine `C:\foreman.log.`__ - the output left from the finish script. Also, comment out the clean up stage in the finish script to examine and test the rendered scripts directly.

@@ -18,7 +18,7 @@ Relevant folders only. All steps are covered below; just so you know your way ar
 - `./tools` - files and utilities witch are injected to the WIM files are located here
 
 ## I. Setup your "Technician Computer"
-Plan on with operating systems / images you want to serve. For a list of possible
+Plan on which operating systems / images you want to serve. For a list of possible
 choices see `./inc/Config.ps1.sample`.
 If your OS is not listed, it is quite easy do add new ones, see further below.
 
@@ -57,10 +57,10 @@ Since this is used to test networking the WinPE stage, any pingable IP will do h
 
 ### Adding extras, drivers and boot files
 1. Create a copy of `./install/directory.template` in `./install/`. Name it after the OS name found in `Config.ps1`.
-2. Repeat for each os
+2. Repeat for each OS
 2. The template for Windows PE is already prepared; but still check whatever it need changes
-5. Copy boot files from `./sources/<os>/boot/*` do `boot/`. These will later be download by foreman-proxy.
-6. Copy `winpe.wim` from WAIK  to `./sources/windows-pe-x64/`
+5. Copy boot files from `./sources/<os>/boot/*` to `boot/`. These will later be downloaded by foreman-proxy.
+6. Copy `winpe.wim` from WAIK to `./sources/windows-pe-x64/`
 
 ## III. Prepare `install.wim` and `boot.wim`
 Start `./run-wimaging-shell.cmd`. From the menu, select the configuration for the session.
@@ -73,7 +73,7 @@ To show the menu again, run `./Show-Menu.ps1`. Go through all your operating sys
 
 ### Adding drivers and extras
 - Copy drivers and extras to the respective folders in `./install/<osname>`. The folder structure below `drivers/` does not matter, all drivers present will be added recursively.
-- The `extra/` folder is optional. The structure in there is up to you. If you just want to sick with the provided template, download the puppet version you need and rename it `puppet.msi`.
+- The `extra/` folder is optional. The structure in there is up to you. If you just want to stick with the provided template, download the puppet version you need and rename it `puppet.msi`.
 
 ### Creating `boot.wim`
 One winpe image will serve as boot file for your all operating systems.
@@ -92,7 +92,7 @@ Alternatively, you can run each step separately with the respective commands. Th
 
 ## IV. Sync `./install` folder to your file server.
 __Notes___: The file server must share these files via `http://` and/or `ftp://`.
-Test if this share is accessible. If you like, you can use the same host; for instance by stalling IIS (not covered).
+Test if this share is accessible. If you like, you can use the same host; for instance by installing IIS (not covered).
 Alternatively, set `$install_root` in `Config.ps1` to point directly to a network location.
 
 ## V. Configure Foreman
