@@ -2,7 +2,7 @@
 - ```Init-InstallSources.ps1```: Copies ISO files to wimaging.
 - ```Init-WorkWim.ps1```: Initializes work .wim file from sources
 - ```Update-All.ps1```: Triggers full-cycle .wim process.
-- ```Backup-WorkWim.ps1```: Backs up current .wim (in case you don't want to loose your changes).
+- ```Backup-WorkWim.ps1```: Backs up current .wim (in case you don't want to lose your changes).
 - ```Push-WimBoot.ps1```: Pushes current work boot.wim to install dirrectory, which makes it available over network.
 - ```Unmount-VHD.ps1```: Unmounts VHD
 - ```Update-BootAll.ps1```
