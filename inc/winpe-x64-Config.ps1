@@ -25,6 +25,9 @@ $os = "windows-pe-x64"
 #############################
 $edition = "professional"
 
+
+
+
 # If managing a boot image ($true or $false)
 $boot = $true
 
@@ -49,6 +52,7 @@ $drivers_dir = ".\sources\${os}\drivers"
 # Windows ADK (default:c:\Program Files (x86)\Windows Kits\8.0\Assessment and Deployment Kit)
 #$windows_adk_path="C:\Program Files (x86)\Windows Kits\8.1\Assessment and Deployment Kit"
 
+
 # WSUS Offline location. Must point to root that contains subfolders for distributions
 #$wsus_offline_dir = "\wsusoffline\client"
 
@@ -66,3 +70,6 @@ $drivers_dir = ".\sources\${os}\drivers"
 
 # Virtual Box Manage Utility
 #$vbox_manage="c:\Program Files\Oracle\VirtualBox\VBoxManage.exe"
+
+#ADK Amd64
+$windows_adk_packages_path="${windows_adk_path}\Windows Preinstallation Environment\amd64"
