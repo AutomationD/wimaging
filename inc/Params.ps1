@@ -143,6 +143,19 @@ if ($boot -ne $true) {
 			$wim_index = 2
 			$wim_image_name = "Windows Server 2012 R2 SERVERSTANDARD"
 		}
+	} elseif ($os -eq "server-2016") {
+		# Directory where the updates are located
+		$updates_dir = $wsus_offline_dir+"\w100-x64\glb"
+		if ($edition -eq "datacenter") {
+			# Index of the actual image in the original install.wim
+			$wim_index = 4
+
+			# Image name in the original install.wim
+			$wim_image_name = "Windows Server 2016 SERVERDATACENTER"
+		} elseif ($edition -eq "standard") {
+			$wim_index = 2
+			$wim_image_name = "Windows Server 2016 SERVERSTANDARD"
+		}
 	} elseif ($os -eq "win81x64") {
 		# Directory where the updates are located
 		$updates_dir = $wsus_offline_dir+"\w63-x64\glb"
