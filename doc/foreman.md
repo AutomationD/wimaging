@@ -155,5 +155,5 @@ The templates most likely need a lot of testing to work. This is not covered her
 1. __Get your templates to render correctly__. Create a random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
 2. __Continue testing with VMs__ to test netbooting and basic installation
 3. __Debug `peSetup.cmd`__ by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
-4. Use a manually installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
+4. Use a manually installed host to test rendered snippets like `Wimaging extraFinishCommands` directly.
 4. __Examine `C:\foreman.log.`__ - the output left from the finish script. Also, comment out the clean up stage in the finish script to examine and test the rendered scripts directly.
