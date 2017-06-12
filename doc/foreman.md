@@ -144,7 +144,7 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 - `localAdminiAccountDisabled`: false - will keep the local administrator account disabled (default windows)
 - `ntpSever`: time.windows.com,other.time.server - ntp server to use
 - `domainAdminAccount`: administrator@domain.com - use this account to join the computer to a domain
-- `domainAdminAccountPasswd`: Pa55w@rd - Password for the domain Admin account
+- `domainAdminAccountPassword`: Pa55w@rd - Password for the domain Admin account
 - `computerOU`: OU=Computers,CN=domain,CN=com - Place the computer account in specified Organizational Unit
 - `computerOuSuffix`: Used if `computerOU` is not present to generate the computer OU from hostgroup and hostdomain. `computerOU` takes precedence! Note, the OU must still be manually created in active directory.
 - `computerDomain`: domain.com # domain to join
