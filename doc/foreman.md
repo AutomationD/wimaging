@@ -46,16 +46,16 @@ The naming of the templates is a suggestion and up to you. Keep in mind, this do
 Since it is very likely you will need to edit these templates to your needs read about [Foreman Template Writing](http://projects.theforeman.org/projects/foreman/wiki/TemplateWriting)
 
 ### Required templates
-#### WAIK Finish
-- Name: `WAIK Finish`
+#### Wimaging Finish
+- Name: `Wimaging Finish`
 - Kind: `finish`
 
-#### WAIK unattend.xml
-- Name: `WAIK unattend.xml`
+#### Wimaging unattend.xml
+- Name: `Wimaging unattend.xml`
 - Type: Provision
 
-#### WAIK WAIK peSetup.cmd
-- Name: `WAIK peSetup.cmd`
+#### Wimaging peSetup.cmd
+- Name: `Wimaging peSetup.cmd`
 - Kind: `script`
 
 __Note:__ To get the download folders nicely, the [`wget64.exe`](https://www.gnu.org/software/wget/manual/wget.html) commands in this template might need tweaking. This could
@@ -63,17 +63,17 @@ especially be necessary if you intend to use the `extraFinishCommands` snippet.
 Eg, `--cut-dirs=3` would cut the first three directories form the download path when saving locally.
 This way `http://winmirror.domain.com/pub/win81x64/extras/puppet.msi` will be stripped of `pub/win81x64/extras` and download to `puppet.msi`.
 
-#### WAIK PXELinux
-- Name: `WAIK PXELinux`
+#### Wimaging PXELinux
+- Name: `Wimaging PXELinux`
 - Kind: `PXE Linux`
 
 ### Optional templates
-#### WAIK joinDomain.ps1
-- Name: `WAIK joinDomain.ps1`
+#### Wimaging joinDomain.ps1
+- Name: `Wimaging joinDomain.ps1`
 - Kind: `user_data`
 
-#### WAIK local users
-- Name: `WAIK local users`
+#### Wimaging local users
+- Name: `Wimaging local users`
 - Kind: Snippet
 
 __Note:__ This snippet creates extra users in the unattended stage.
@@ -90,16 +90,16 @@ If you want to disguise your password, you could add a host parameter `localUser
 
 Note,  the string `Password` is appended your passwords. You can try this out with by generating an unattend.xml containing local users using WAIK.
 
-#### WAIK extraFinishCommands
-- Name: `WAIK extraFinishCommands`
+#### Wimaging extraFinishCommands
+- Name: `Wimaging extraFinishCommands`
 - Kind: Snippet
 
 __Note:__ The commands here are executed at the last stage just before finishing host building.
 Make sure they get executed in a synchronous way (eg. do not run in background like msiexec).
 Otherwise the following reboot might kill them.
 
-#### WAIK OU from Hostgroup
-- Name: `WAIK OU from Hostgroup`
+#### Wimaging OU from Hostgroup
+- Name: `Wimaging OU from Hostgroup`
 - Kind: Snippet
 
 __Note__: This snippet may be used to generate the computer OU from the host's hostgroup and domain.
@@ -113,14 +113,14 @@ For each of your Windows versions add a new installation media pointing to the r
 Eg, `http://winmirror.domain.com/pub/win81x64`. Assign them to your operatingsystem.
 
 ## V. Add partition table
-Add the diskpart script from `./foreman/waik_partition_table.erb` as new partition table. Assign it to your windows OS.
+Add the diskpart script from `./foreman/wimaging_partition_table.erb` as new partition table. Assign it to your windows OS.
 
 ## VI. Define templates
 Link all the created templates as well as the installation media and partition table to the OS:
 
 - Head to your OS, then provisioning
 - Select the template from each kind from the drop down list
-- In partition tables, select `WAIK default`
+- In partition tables, select `Wimaging default`
 - In installation media, check the appropriate installation media added above.
 
 ![Link templates to OS](img/forman_os_templates.png "Linking Windows 8 OS in Foreman")
@@ -144,7 +144,7 @@ The following parameters are only applied if they exist. Some, like `domainAdmin
 - `localAdminiAccountDisabled`: false - will keep the local administrator account disabled (default windows)
 - `ntpSever`: time.windows.com,other.time.server - ntp server to use
 - `domainAdminAccount`: administrator@domain.com - use this account to join the computer to a domain
-- `domainAdminAccountPasswd`: Pa55w@rd - Password for the domain Admin account
+- `domainAdminAccountPassword`: Pa55w@rd - Password for the domain Admin account
 - `computerOU`: OU=Computers,CN=domain,CN=com - Place the computer account in specified Organizational Unit
 - `computerOuSuffix`: Used if `computerOU` is not present to generate the computer OU from hostgroup and hostdomain. `computerOU` takes precedence! Note, the OU must still be manually created in active directory.
 - `computerDomain`: domain.com # domain to join
@@ -155,5 +155,5 @@ The templates most likely need a lot of testing to work. This is not covered her
 1. __Get your templates to render correctly__. Create a random `Bare Metal` host in the desired hostgroup for this purpose and make extensive use of foreman's excellent template __Preview__.
 2. __Continue testing with VMs__ to test netbooting and basic installation
 3. __Debug `peSetup.cmd`__ by pausing it at the send (remove the comment from `::PAUSE`). Then, use `Ctrl-C` to cancel the script altogether. This way you can debug the rendered `peSetup.cmd` quite nicely in WinPE (eg, `notepad peSetup.cmd`)
-4. Use a manually installed host to test rendered snippets like `WAIK extraFinishCommands` directly.
+4. Use a manually installed host to test rendered snippets like `Wimaging extraFinishCommands` directly.
 4. __Examine `C:\foreman.log.`__ - the output left from the finish script. Also, comment out the clean up stage in the finish script to examine and test the rendered scripts directly.
