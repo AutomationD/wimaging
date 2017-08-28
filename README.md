@@ -23,7 +23,7 @@ All relevant configuration files like `unattend.xml` are rendered by Foreman and
 ## Prerequisites:
 The list requirements for using Foreman, all of them are __not__ covered by this guide.
 
-- A working Foreman __version 1.8+__ installation (obviously), capable of net booting clients along with a working DNS / DHCP infrastructure
+- A working Foreman __version 1.8+__ installation (obviously), capable of net booting clients along with a working DNS / DHCP infrastructure. If you plan on using PXELinux, make sure your Foreman instance runs [Syslinux 5+](http://www.syslinux.org/wiki/index.php?title=Syslinux_5_Changelog#Changes_in_5.10), witch is required for wimboot. PXELinux 5.10 is confirmed to work with wimboot.
 - Currently, [Safe Mode Render](http://theforeman.org/manuals/1.9/index.html#3.5.2ConfigurationOptions) must be disabled in foreman
 - A utility Windows VM or physical host to prepare the WIM images (Microsoft likes the term [Technician Computer](https://technet.microsoft.com/en-us/library/cc766148(v=ws.10).aspx))
 - A file server serving http and/or ftp protocols; fast machine recommended for production
