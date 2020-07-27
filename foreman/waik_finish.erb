@@ -7,13 +7,13 @@ params:
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
 - localAdminiAccountDisabled: false
 - ntpSever: time.windows.com,other.time.server
-- domainAdminAccount: administrator@domain.com # use this account to join domain
+- domainAdminAccount: administrator@domain.com # use tthis account to join domain
 - domainAdminAccountPasswd: Password for the domain Admin account
 - computerOU: OU=Computers,CN=domain,CN=com # Place the computer account in specified Organizational Unit
 - computerDomain: domain.com # domain to join
 -%>
 @echo off
-<% unless @host.params['localAdminiAccountDisabled'] -%>
+<% unless host_param('localAdminiAccountDisabled') -%>
   echo Activating administrator
   net user administrator /active:yes
 <% end -%>
@@ -21,13 +21,13 @@ params:
 <% if @host.pxe_build? %>
   set ctr=0
   set nettimeout=10
-  set nwhost=<%= @host.puppetmaster %>
+  set nwhost=<%= foreman_server_fqdn %>
 
   (echo Updating time)
   (sc config w32time start= auto)
   sc start w32time
   :ntp_testip
-    ::ipconfig /renew
+    ipconfig /renew
     ping -n 1 %nwhost% > NUL
     if %errorlevel% == 0 goto ntp_testip_ok
     timeout /t 10 >NUL
@@ -42,54 +42,60 @@ params:
 
   echo Ping to %nwhost% OK!
 
-  <% if @host.params['ntpSever'] %>
+  <% if host_param('ntpSever') %>
     echo setting time server
-    w32tm /config /manualpeerlist:<%= @host.params['ntpSever'] %> /syncfromflags:manual /update
+    w32tm /config /manualpeerlist:<%= host_param('ntpSever') %> /syncfromflags:manual /update
   <% end %>
 
   echo sync time
-  w32tm /resync
+  w32tm /resync /force
   w32tm /resync
 
   :: You can join your machine to the domain right here >
 
-  <% if @host.params['domainAdminAccount'] and @host.params['domainAdminAccountPasswd'] -%>
+  <% if host_param('domainAdminAccount') and host_param('domainAdminAccountPasswd') %>
   echo joining domain
   powershell.exe -OutputFormat text -ExecutionPolicy remotesigned -command c:\deploy\joinDomain.ps1
+  nltest /dclist:<%= host_param('computerDomain') %>
+  IF %ERRORLEVEL% NEQ 0 (
+    echo Domain join not successfull, exiting
+    exit 1
+  )
   <% end %>
 
   :: < You can join your machine to the domain right here
 
-  <% if @host.params['localAdminiAccountDisabled'] %>
+  <% if host_param('localAdminiAccountDisabled') %>
       echo Disabling %tempAdminUser%
       net user %tempAdminUser% %tempAdminUser% /active:no
   <% end %>
-
+  <% unless host_param_true?('waikDebugMode') %>
   echo safely remove files
   sdelete.exe -accepteula -p 2 -r c:\wimaging
   sdelete.exe -accepteula -p 2 c:\Windows\Panther\unattend.xml
   sdelete.exe -accepteula -p 2 C:\Windows\Setup\Scripts\SetupComplete.cmd
   sdelete.exe -accepteula -p 2 -r c:\minint
   sdelete.exe -accepteula -p 2 -r c:\wimaging
+  <% end %>
 
-  <% if snippets "WAIK extraFinishCommands" -%>
+  <% if snippet "WAIK extraFinishCommands" -%>
   echo Running extra commands
-  <%= snippets "WAIK extraFinishCommands" %>
+  <%= snippet "WAIK extraFinishCommands" %>
+  <% unless host_param_true?('waikDebugMode') -%>
   echo cleaning up extras
   sdelete.exe -accepteula -p 2 -r c:\extras
+  <% end -%>
   <% end -%>
 
   echo Tell foreman build mode has finished
   wget.exe <%= foreman_url('built') %>
 
-  sdelete.exe -accepteula -p 2 -r c:\deploy
-
+  <% unless host_param_true?('waikDebugMode') -%>
   echo remove leftover directories
   rmdir /s /q c:\wimaging
   rmdir /s /q c:\minint
-  rmdir /s /q c:\deploy
   rmdir /s /q c:\extras
-
-  echo rebooting...
-  shutdown /r /t 5
+  del /q /s C:\.gitignore
+  start "" sdelete.exe -accepteula -p 2 -r c:\deploy
+  <% end -%>
 <% end -%>

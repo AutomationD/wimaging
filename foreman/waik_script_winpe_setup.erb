@@ -1,71 +1,100 @@
 <%#
 kind: script
-name: WAIK peSetup.cmd
+name: WAIK default
 # Parameters are expected to be set in Foreman (globally or per group/host)
 params:
 - wimImageName: Windows 8.1 Pro # name of wim image to apply
 - windowsLicenseKey: ABCDE-ABCDE-ABCDE-ABCDE-ABCDE # Valid Windows license key
 - windowsLicenseOwner: Company, INC # Legal owner of the Windows license key
 -%>
+<% if @host.pxe_build? %>
 @echo off
+
+:: Set Hi Power for deployment
+powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
 set WGET=x:\wimaging\deploy\wget64.exe
+
+:: Check Boot-Mode
+wpeutil UpdateBootInfo
+FOR /F "tokens=* USEBACKQ" %%F IN (`reg query HKLM\System\CurrentControlSet\Control /v PEFirmwareType`) DO (
+    SET fw=%%F
+)
+:: Compare the last 3 chars
+if "%fw:~-3%"=="0x1" set firmware=BIOS
+if "%fw:~-3%"=="0x2" set firmware=UEFI
+
+echo ==============================================
+echo Using %firmware% mode
+echo ==============================================
+echo WARNING - WIPING ALL DATA ON DISK #<% if host_param('wimInstallDisk') && host_param('wimInstallDisk').to_i >= 0 %><%= host_param('wimInstallDisk') %><% else %>0<% end %> IN 5SEC
+echo ==============================================
+ping 127.0.0.1 > NUL
 
 <%= @host.diskLayout %>
 
-%WGET% <%= @host.os.medium_uri(@host).to_s %>/sources/install.wim -O C:\install.wim
+%WGET% <%= medium_uri %>/sources/install.wim -O Z:\install.wim
 
 echo Write the install image to the partition
-dism.exe /apply-image /imagefile:C:\install.wim /name:"<%= @host.params['wimImageName'] %>" /ApplyDir:C:\
+dism.exe /apply-image /imagefile:Z:\install.wim /name:"<%= host_param('wimImageName') %>" /ApplyDir:Z:\
 
 echo removing install.wim
-del /q /s C:\install.wim
- 
-::Set the proper boot sector
-bootsect.exe /nt60 C:
-C:\Windows\System32\bcdboot C:\Windows /l en-US
- 
-echo Downloading the drivers 
-md c:\drivers
-%WGET% -P c:\drivers -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= @host.os.medium_uri(@host).to_s %>/drivers/
+del /q /s Z:\install.wim
 
-<% if snippets "WAIK extraFinishCommands" -%>
+::Set the proper boot sector
+echo Creating %firmware% boot mode
+IF %firmware%==UEFI (
+Z:\Windows\System32\bcdboot Z:\Windows /l en-US /s Y:
+) ELSE (
+bootsect.exe /nt60 Z:
+Z:\Windows\System32\bcdboot Z:\Windows /l en-US
+)
+
+<% if snippet "WAIK extraFinishCommands" %>
   echo Downloading extras
-  md C:\Extras
-  %WGET% -P c:\Extras -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= @host.os.medium_uri(@host).to_s %>/extras/
+  md Z:\Extras
+  %WGET% -P Z:\Extras -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= medium_uri %>/extras/
 <% end -%>
- 
+
 echo Stage the Unattend.xml file for dism to apply
-set myDIR=c:\Windows\Panther\
+set myDIR=Z:\Windows\Panther\
 IF not exist %myDIR% (mkdir %myDIR%)
 
 echo Downloading unattend.xml
-%WGET% --no-verbose <%= foreman_url("provision") -%> -O c:\Windows\Panther\unattend.xml
+%WGET% --no-verbose <%= foreman_url("provision") -%> -O Z:\Windows\Panther\unattend.xml
 
 echo Downloading finsh script and activating SetupComplete.cmd
-md c:\deploy
-%WGET% --no-verbose <%= foreman_url("finish") -%> -O C:\deploy\foreman-finish.bat
+md Z:\deploy
+%WGET% --no-verbose <%= foreman_url("finish") -%> -O Z:\deploy\foreman-finish.bat
 
 echo copy tools
-copy x:\wimaging\deploy\wget64.exe C:\deploy\
-copy x:\wimaging\deploy\wget64.exe C:\Windows\wget.exe
-copy x:\wimaging\deploy\sdelete.exe C:\Windows\
-IF not exist C:\Windows\Setup\Scripts (md C:\Windows\Setup\Scripts)
-echo call C:\deploy\foreman-finish.bat ^> c:\foreman.log 2^>^&1 > C:\Windows\Setup\Scripts\SetupComplete.cmd
+copy x:\wimaging\deploy\wget64.exe Z:\deploy\
+copy x:\wimaging\deploy\wget64.exe Z:\Windows\wget.exe
+copy x:\wimaging\deploy\sdelete.exe Z:\Windows\
+IF not exist Z:\Windows\Setup\Scripts (md Z:\Windows\Setup\Scripts)
+echo call C:\deploy\foreman-finish.bat ^> C:\foreman.log 2^>^&1 > Z:\Windows\Setup\Scripts\SetupComplete.cmd
 
 <% if foreman_url('user_data') %>
   echo Downlodiang user data
-  %WGET% <%= foreman_url('user_data') %> -O c:\deploy\joinDomain.ps1
+  %WGET% <%= foreman_url('user_data') %> -O Z:\deploy\joinDomain.ps1
 <% end -%>
-  
+
 echo Creating a temp staging folder for DISM
-md c:\MININT\Scratch
+md Z:\MININT\Scratch
 
 echo Apply Unattend.xml
-dism.exe /Image:C:\ /Apply-Unattend:c:\Windows\Panther\unattend.xml /ScratchDir:C:\MININT\Scratch/
+dism.exe /Image:Z:\ /Apply-Unattend:Z:\Windows\Panther\unattend.xml /ScratchDir:Z:\MININT\Scratch
+
+echo Downloading drivers from <%= snippet 'WAIK driverSource' %>
+md Z:\drivers
+%WGET% -P Z:\drivers -r -np -nH --cut-dirs=3 -R index.html -q --level=0 <%= snippet 'WAIK driverSource' %>/
 
 echo Apply Drivers
-dism.exe /Image:C:\ /Add-Driver /Driver:c:\drivers\ /Recurse /ForceUnsigned
+dism.exe /Image:Z:\ /Add-Driver /Driver:Z:\drivers\ /Recurse /ForceUnsigned
 
-:: Uncomment PAUSE for debug:
-::PAUSE
+<% if host_param_true?('waikDebugMode') %>
+:: Enable PAUSE for debug:
+PAUSE
+<% end %>
+<% end %>
 exit 0

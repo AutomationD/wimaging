@@ -54,7 +54,7 @@ Since it is very likely you will need to edit these templates to your needs read
 - Name: `WAIK unattend.xml`
 - Type: Provision
 
-#### WAIK WAIK peSetup.cmd
+#### WAIK peSetup.cmd
 - Name: `WAIK peSetup.cmd`
 - Kind: `script`
 
@@ -66,6 +66,12 @@ This way `http://winmirror.domain.com/pub/win81x64/extras/puppet.msi` will be st
 #### WAIK PXELinux
 - Name: `WAIK PXELinux`
 - Kind: `PXE Linux`
+
+#### WAIK iPXE
+- Name: `WAIK iPXE`
+- Kind: `iPXE`
+
+Have a look at the [UEFI upgrade guide](upgrade-uefi.md) to use UEFI with iPXE/wimboot
 
 ### Optional templates
 #### WAIK joinDomain.ps1

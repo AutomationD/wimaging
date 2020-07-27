@@ -2,12 +2,30 @@
 kind: user_data
 name: WAIK joinDomain.ps1
 params:
-- domainAdminAccount: administrator@domain.com # use tthis account to join domain. If set, domain join will run
+- domainAdminAccount: adjoin@domain.com # use tthis account to join domain. If set, domain join will run
 - domainAdminAccountPasswd: Password for the domain Admin account
 - computerOU: OU=Computers,CN=domain,CN=com # Place the computer account in specified Organizational Unit
 - computerDomain: domain.com # domain to join, optional
 -%>
-$user = "<%= @host.params['domainAdminAccount'] -%>"
-$passwd = ConvertTo-SecureString -String "<%= @host.params['domainAdminAccountPasswd'] -%>" -AsPlainText -Force
+$user = "<%= host_param('domainAdminAccount') -%>"
+$passwd = ConvertTo-SecureString -String "<%= host_param('domainAdminAccountPasswd') -%>" -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $passwd
-Add-Computer -DomainName <% if @host.params['computerDomain'] -%><%= @host.params['computerDomain'] -%><% else -%><%= @host.domain -%><% end -%> -Credential $Credential <% if  @host.params['computerOU'] -%>-OUPath "<%= @host.params['computerOU'] -%>"<% elsif snippet('WAIK OU from hostgroup') -%>-OUPath "<%= snippet('WAIK OU from hostgroup') -%>"<% end -%> -PassThru
+
+$dns = Test-Connection -TargetName <%= host_param('computerDomain') %> -Quiet
+if ( -Not $dns ) {
+  IPCONFIG /RELEASE
+  IPCONFIG /RENEW
+}
+
+$unjoined = $true
+while($unjoined) {
+  Add-Computer -DomainName <% if host_param('computerDomain') -%><%= host_param('computerDomain') -%><% else -%><%= @host.domain -%><% end -%> -Credential $Credential <% if  host_param('computerOU') -%>-OUPath "<%= host_param('computerOU') -%>"<% elsif snippet('WAIK OU from hostgroup') -%>-OUPath "<%= snippet('WAIK OU from hostgroup') -%>"<% end -%> -PassThru
+  $test = Test-ComputerSecureChannel
+  if ($test) {
+    $unjoined = $false
+  } else {
+    Write-Host "DC Connection unsuccessful, sleeping..."
+    Start-Sleep -Seconds 5
+  }
+}
+gpupdate /force

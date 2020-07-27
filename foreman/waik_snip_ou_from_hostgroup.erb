@@ -15,4 +15,4 @@ domain = ''
 @host.domain.to_s.split('.').each { |dc| domain += dc_prefix + dc + suffix }
 domain.chomp!(suffix)
 -%>
-<%= fullou -%><%if  @host.params['computerOuSuffix'] -%><%= @host.params['computerOuSuffix'].to_s.chomp(',')-%>,<% end -%><%= domain -%>
+<%= fullou -%><%if  host_param('computerOuSuffix') -%><%= host_param('computerOuSuffix').to_s.chomp(',')-%>,<% end -%><%= domain -%>

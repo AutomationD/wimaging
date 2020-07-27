@@ -1,0 +1,18 @@
+<%
+case  @host.model.to_s.downcase
+  when /^zbox-en10/
+    product = 'zotac-en10'
+  when /^zbox-en(7|5)2/
+    product = 'zotac-en20'
+  when /^zbox-/
+    product = 'zotac-en9'
+  when /precision/i
+    product = @host.model.to_s.downcase.gsub(/(tower)| /,'')
+  else
+    product = @host.model.to_s.split(//).first(4).join.downcase.gsub(/\W/, '_')
+end
+
+product = 'generic' if product.empty?
+
+-%>
+<%= medium_uri %>/drivers/<%= product %>

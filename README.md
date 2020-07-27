@@ -1,6 +1,9 @@
 # Provision Windows hosts with [Foreman](http://theforeman.org/)
 
-[![Join the chat at https://gitter.im/helge000/wimaging-ng](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/helge000/wimaging-ng?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## New Features
+
+- Added UEFI support via iPXE, see dedicated [upgtade guide](doc/upgrade-uefi.md)
+- Added / updated all my currently working templates
 
 ## Introduction
 `wimaging-ng` a set of scripts to prepare [WIM images](https://en.wikipedia.org/wiki/Windows_Imaging_Format) and templates for Foreman to provision Windows hosts.
@@ -47,7 +50,7 @@ An outline of the process to better understand the tasks witch need to be done. 
 Simple as that. For Bare Metal hosts [Foreman discovery](https://github.com/theforeman/foreman_discovery) is recommended.
 
 ### Phase II
-1. PXE / [wimboot](http://ipxe.org/wimboot) boots customized boot.wim (winpe)
+1. iPXE / PXE / [wimboot](http://ipxe.org/wimboot) boots customized boot.wim (winpe)
 2. Winpe downloads the script `foreman_url('script')`; executes it:
   1. Drive 0 is cleaned, partitioned and mounted using foreman partition table (simple `diskpart` script)
   4. `install.wim` is downloaded via http/ftp and applied using `dism.exe`

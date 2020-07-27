@@ -1,13 +1,33 @@
 <%#
 kind: ptable
-name: WAIK default
--%>
+name: WAIK default UEFI/BIOS
+%>
+
 :: Disk Partitioning Layout
 
 set DPFILE=%SYSTEMDRIVE%\dp.txt
+<% host_param('wimInstallDisk') && host_param('wimInstallDisk').to_i >= 0 ? disknum = host_param('wimInstallDisk').to_i : disknum = 0 -%>
 
+IF %firmware%==UEFI (
 :: Append commands to Diskpart file
-echo select disk 0 > %DPFILE%
+echo select disk <%= disknum %> > %DPFILE%
+echo clean >> %DPFILE%
+echo convert gpt >> %DPFILE%
+echo create partition efi size=100 >> %DPFILE%
+echo select partition 1 >> %DPFILE%
+echo format quick fs=fat32 label="System" >> %DPFILE%
+echo assign letter="Y" >> %DPFILE%
+echo create partition msr size=16 >> %DPFILE%
+echo create partition primary >> %DPFILE%
+echo select partition 3 >> %DPFILE%
+echo format quick fs=ntfs label="<%= host_param('wimImageName').to_s.strip.gsub(/\W/, '') %>" >> %DPFILE%
+echo assign letter="Z" >> %DPFILE%
+echo exit >> %DPFILE%
+GOTO PART
+)
+
+IF %firmware%==BIOS (
+echo select disk <%= disknum %> > %DPFILE%
 echo clean >> %DPFILE%
 echo create partition primary size=100 >> %DPFILE%
 echo select partition 1 >> %DPFILE%
@@ -15,10 +35,18 @@ echo active >> %DPFILE%
 echo format quick fs=ntfs >> %DPFILE%
 echo create partition primary >> %DPFILE%
 echo select partition 2 >> %DPFILE%
-echo format quick fs=ntfs label="<%= @host.operatingsystem.family -%>" >> %DPFILE%
-echo assign letter="C" >> %DPFILE%
+echo format quick fs=ntfs label="<%= [@host.operatingsystem.name.to_s.strip.gsub(/\W/, '').capitalize[0..27], @host.operatingsystem.major].join %>" >> %DPFILE%
+echo assign letter="Z" >> %DPFILE%
 echo exit >> %DPFILE%
+GOTO PART
+) ELSE (
+echo Error detecting Firmware: Got %firmware% - expected BIOS or UEFI
+echo press any key to exit
+pause
+exit 1
+)
 
+:PART
 :: Execute Diskpart with file as script argument
 diskpart /s %DPFILE%
 

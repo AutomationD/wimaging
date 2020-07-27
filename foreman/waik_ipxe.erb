@@ -1,0 +1,10 @@
+<%#
+kind: iPXE
+name: WAIK default iPXE
+-%>
+#!ipxe
+kernel <%= medium_uri -%>/boot/wimboot
+initrd <%= medium_uri -%>/boot/bcd      BCD
+initrd <%= medium_uri -%>/boot/boot.sdi boot.sdi
+initrd <%= medium_uri -%>/sources/boot.wim boot.wim
+boot
