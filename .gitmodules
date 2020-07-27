@@ -1,6 +1,6 @@
 [submodule "foreman"]
 	path = foreman
-	url = https://github.com/kireevco/foreman-wimaging.git
+	url = https://github.com/helge000/foreman-wimaging.git
 [submodule "tools"]
 	path = tools
 	url = https://github.com/kireevco/wimaging-tools.git
