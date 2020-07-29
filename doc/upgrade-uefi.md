@@ -51,12 +51,30 @@ In my case I needed FTP support. This is not turned on by default, as many other
 On your Foreman Proxy with the netboot/TFTP role, enable HTTP boot by running foreman-installer:
 ```text
 # foreman-installer --foreman-proxy-http \
-                    --foreman-proxy-http-port 8000
+                    --foreman-proxy-http-port 8000 \
+                    --foreman-proxy-httpboot \
+                    --foreman-proxy-httpboot-listen-on both
 ```
 
 Do a simple function test by downloading our `ipxe.efi` file:
 ```text
 $ wget http://foreman-proxy.lan:8000/httpboot/ipxe.efi
+```
+
+If this is not working, check your proxy's config, it should look like this:
+
+```text
+# /etc/foreman-proxy/settings.d/httpboot.yml
+---
+# Enable publishing of a given directory under /EFI and /httpboot paths.
+# Directory listing is not possible, symlinks are followed but not outside
+# of the root directory specified in this file.
+
+# Enables the module, make sure to enable TFTP module as well to allow
+# configuration files deployment.
+:enabled: true
+
+:root_dir: /var/lib/tftpboot
 ```
 
 For more details, please read [Lukáš Zapletal's Intro](https://community.theforeman.org/t/discovery-ipxe-efi-workflow-in-foreman-1-20/13026)
